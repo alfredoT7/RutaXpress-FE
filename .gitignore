@@ -1,0 +1,62 @@
+*.iml
+.gradle
+/local.properties
+/.idea/caches
+/.idea/libraries
+/.idea/modules.xml
+/.idea/workspace.xml
+/.idea/navEditor.xml
+/.idea/assetWizardSettings.xml
+.DS_Store
+/build
+/captures
+.externalNativeBuild
+.cxx
+local.properties
+.gradle/
+build/
+
+# Archivos de configuración de IDE
+.idea/
+
+# Archivos del sistema operativo
+Thumbs.db
+
+# Archivos de logs y temporales
+*.log
+*.tmp
+*.swp
+
+# Archivos de configuración personal (no deben compartirse)
+gradle.properties
+
+# Gradle Wrapper
+gradlew
+gradlew.bat
+
+# Archivos de compilación
+*.class
+*.jar
+*.war
+*.ear
+
+# Archivos de resultados de tests
+/test-results/
+
+
+# Otros archivos binarios y generados
+*.apk
+*.dex
+*.so
+*.out
+*.exe
+*.dll
+*.pdb
+*.dylib
+*.bin
+*.lock
+
+# Archivos de backups
+*.bak
+*.backup
+*.old
