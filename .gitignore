@@ -28,11 +28,11 @@ Thumbs.db
 *.swp
 
 # Archivos de configuración personal (no deben compartirse)
-gradle.properties
+#gradle.properties
 
 # Gradle Wrapper
-gradlew
-gradlew.bat
+#gradlew
+#gradlew.bat
 
 # Archivos de compilación
 *.class
