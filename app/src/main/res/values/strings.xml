@@ -1,3 +1,11 @@
 <resources>
     <string name="app_name">RutaXpressApp</string>
+    <string name="login_tittle">Bienvenido!</string>
+    <string name="email_field_text">Correo Electronico</string>
+    <string name="password_field_text">Contraseña</string>
+    <string name="forgot_password">Olvidaste tu contraseña</string>
+    <string name="login_button_text">Login</string>
+    <string name="not_member_text">No eres parte? Regístrate ahora!</string>
+    <string name="or_continue_with">O Ccontinua con</string>
+    <string name="login_header_image">Login Header Image</string>
 </resources>
