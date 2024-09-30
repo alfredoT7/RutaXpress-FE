@@ -1,5 +1,6 @@
 package com.softcraft.rutaxpressapp
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.widget.Button
@@ -39,5 +40,13 @@ class LoginActivity : AppCompatActivity() {
 
     private fun requestLogin() {
         Log.i("RutaXpress", "Login request boton DONE")
+
+        //Test only map
+        if(true){
+            val attemp = Intent(this, InitialMapActivity::class.java)
+            startActivity(attemp)
+        }else{
+            Log.i("RutaXpress", "No es posible logearse")
+        }
     }
 }
