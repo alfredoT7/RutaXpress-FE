@@ -33,6 +33,7 @@ class InitialMapActivity : AppCompatActivity(), OnMapReadyCallback {
 
     override fun onMapReady(googleMap: GoogleMap) {
         map = googleMap
+        enableLocation()
     }
 
     private fun isLocationPermissionGranted() =
@@ -51,6 +52,22 @@ class InitialMapActivity : AppCompatActivity(), OnMapReadyCallback {
              Toast.makeText(this, "Acepta los permisos de localizacion", Toast.LENGTH_SHORT).show()
         }else{
             ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), REQUEST_CODE_LOCATION )
+        }
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        //super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        when(requestCode){
+            REQUEST_CODE_LOCATION -> if(grantResults.isNotEmpty() && grantResults[0]==PackageManager.PERMISSION_GRANTED) {
+                map.isMyLocationEnabled = true
+            }else{
+                Toast.makeText(this, "Acepta los permisos de localizacion", Toast.LENGTH_SHORT).show()
+            }
+            else -> {}
         }
     }
 }
