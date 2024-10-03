@@ -8,10 +8,11 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.google.android.gms.maps.GoogleMap
+import com.google.android.gms.maps.GoogleMap.OnMyLocationButtonClickListener
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 
-class InitialMapActivity : AppCompatActivity(), OnMapReadyCallback {
+class InitialMapActivity : AppCompatActivity(), OnMapReadyCallback, OnMyLocationButtonClickListener {
 
     // Variables globales
     private lateinit var map: GoogleMap
@@ -23,7 +24,13 @@ class InitialMapActivity : AppCompatActivity(), OnMapReadyCallback {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.initial_map)
-        createFragment()
+
+        // Solicitar permisos antes de crear el mapa
+        if (isLocationPermissionGranted()) {
+            createFragment()
+        } else {
+            requestLocationPermission()  // Esto debería solicitar los permisos
+        }
     }
 
     private fun createFragment() {
@@ -33,6 +40,7 @@ class InitialMapActivity : AppCompatActivity(), OnMapReadyCallback {
 
     override fun onMapReady(googleMap: GoogleMap) {
         map = googleMap
+        map.setOnMyLocationButtonClickListener(this)
         enableLocation()
     }
 
@@ -51,7 +59,11 @@ class InitialMapActivity : AppCompatActivity(), OnMapReadyCallback {
         if(ActivityCompat.shouldShowRequestPermissionRationale(this,Manifest.permission.ACCESS_FINE_LOCATION)){
              Toast.makeText(this, "Acepta los permisos de localizacion", Toast.LENGTH_SHORT).show()
         }else{
-            ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), REQUEST_CODE_LOCATION )
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION),
+                REQUEST_CODE_LOCATION
+            )
         }
     }
 
@@ -60,7 +72,6 @@ class InitialMapActivity : AppCompatActivity(), OnMapReadyCallback {
         permissions: Array<out String>,
         grantResults: IntArray
     ) {
-        //super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         when(requestCode){
             REQUEST_CODE_LOCATION -> if(grantResults.isNotEmpty() && grantResults[0]==PackageManager.PERMISSION_GRANTED) {
                 map.isMyLocationEnabled = true
@@ -69,5 +80,19 @@ class InitialMapActivity : AppCompatActivity(), OnMapReadyCallback {
             }
             else -> {}
         }
+    }
+
+    override fun onResumeFragments() {
+        super.onResumeFragments()
+        if(!::map.isInitialized) return
+        if(!isLocationPermissionGranted()){
+            map.isMyLocationEnabled = false
+            Toast.makeText(this, "Acepta los permisos de localizacion", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    override fun onMyLocationButtonClick(): Boolean {
+        Toast.makeText(this, "Botón pulsado", Toast.LENGTH_SHORT).show()
+        return false
     }
 }
