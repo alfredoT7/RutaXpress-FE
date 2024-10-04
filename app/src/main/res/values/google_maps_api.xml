@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="google_maps_key" templateMergeStrategy="preserver" translatable="false">AIzaSyB79qwq-M7ZlCZics6qB7ena3WefS6nAPY</string>
+    <string name="google_maps_key" templateMergeStrategy="preserver" translatable="false">
+        ${BuildConfig.MAPS_API_KEY}
+    </string> <!--Llamamos a la variable que esta en el app/buid.gradle.kts-->
 </resources>
