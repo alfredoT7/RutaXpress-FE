@@ -8,4 +8,5 @@
     <string name="not_member_text">No eres parte? Regístrate ahora!</string>
     <string name="or_continue_with">O continua con</string>
     <string name="login_header_image">Login Header Image</string>
+    <string name="search_box_map">Busca la direccion</string>
 </resources>
