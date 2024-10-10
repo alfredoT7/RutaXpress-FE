@@ -12,6 +12,6 @@
     <string name="search_box_where">Escribe tu ubicacion o selecciona en el mapa</string>
     <string name="bus_lines">Lineas</string>
     <string name="favorite_routes">Rutas Favoritas</string>
-    <string name="my_ubication">Mi Ubicacion</string>
+    <string name="my_ubication">Mi Ubicación</string>
     <string name="search_btn_text">Buscar Trufi</string>
 </resources>
