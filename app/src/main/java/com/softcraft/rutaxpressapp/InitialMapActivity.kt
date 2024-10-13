@@ -1,8 +1,13 @@
 package com.softcraft.rutaxpressapp
 
 import android.Manifest
+import android.content.Context
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.graphics.Matrix
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
@@ -13,12 +18,26 @@ import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.location.LocationServices
+import com.google.android.gms.maps.model.BitmapDescriptor
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
+import com.google.android.gms.maps.model.CustomCap
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.PolylineOptions
+import com.softcraft.rutaxpressapp.routes.ApiService
+import com.softcraft.rutaxpressapp.routes.RouteResponse
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
+import retrofit2.create
 
 class InitialMapActivity : AppCompatActivity(), OnMapReadyCallback, OnMyLocationButtonClickListener {
 
     // Variables globales
     private lateinit var map: GoogleMap
+    private var start:String = "-66.17131236994032,-17.379954096571343"//TENEMOS QUE CREAR UNA BASE DE DATOS CON CORRDENADAS DE LAS PARADAS de los trugis
+    private var end:String = "-66.14519448429931,-17.392252179261888"//HACEMOS UN BACK FACIL PERO TENEMOS QUE HACERLO, DESPUES PINTAR ESTAS RUTAS ES FACIL
 
     companion object{
         const val REQUEST_CODE_LOCATION = 0
@@ -31,10 +50,13 @@ class InitialMapActivity : AppCompatActivity(), OnMapReadyCallback, OnMyLocation
         // Solicitar permisos antes de crear el mapa
         if (isLocationPermissionGranted()) {
             createFragment()
+            createRoute()
         } else {
             requestLocationPermission()  // Esto debería solicitar los permisos
         }
     }
+
+
 
     private fun createFragment() {
         val mapFragment: SupportMapFragment = supportFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
@@ -114,4 +136,52 @@ class InitialMapActivity : AppCompatActivity(), OnMapReadyCallback, OnMyLocation
         Toast.makeText(this, "Botón de ubicación pulsado", Toast.LENGTH_SHORT).show()
         return false
     }
+
+    private fun createRoute() {
+        CoroutineScope(Dispatchers.IO).launch{
+            val request = getRetrofit().create(ApiService::class.java)
+                .getRoute(
+                    "",//Aqui va la API Key, me la piden por privado HIJAS
+                    start,
+                    end
+                )
+            if (request.isSuccessful){
+                drawRoute(request.body())
+                Log.i("alfredoDev","OK")
+            }else{
+                Log.i("alfredoDev","NOT OK")
+            }
+        }
+    }
+
+    /**
+     * Hay QUE REFACTORIZAR HIJAS mejor, talque no se haga todo en un archivos, para no afectar la funcionalidad creo como REACT
+     */
+
+    private fun drawRoute(routeResponse: RouteResponse?) {
+        val polylineOptions = PolylineOptions()
+        routeResponse?.features?.get(0)?.geometry?.coordinates?.forEach {
+            polylineOptions.add(LatLng(it[1], it[0]))
+        }
+        runOnUiThread{
+            val poly = map.addPolyline(polylineOptions)
+            poly.color = ContextCompat.getColor(this, R.color.routeMap)
+            poly.width = 12f
+            poly.endCap = CustomCap(resizeIcon(R.drawable.bus, this))
+        }
+    }
+    private fun resizeIcon(resourceId: Int, context: Context): BitmapDescriptor {
+        val imageBitmap = BitmapFactory.decodeResource(context.resources, resourceId)
+        val scaledBitmap = Bitmap.createScaledBitmap(imageBitmap, 50, 50, false)
+        return BitmapDescriptorFactory.fromBitmap(scaledBitmap)
+    }
+
+    private fun getRetrofit(): Retrofit {
+        return Retrofit.Builder()
+            .baseUrl("https://api.openrouteservice.org/")
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+    }
+
+
 }
