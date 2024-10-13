@@ -3,4 +3,9 @@
     <string name="google_maps_key" templateMergeStrategy="preserver" translatable="false">
         AIzaSyB79qwq-M7ZlCZics6qB7ena3WefS6nAPY
     </string> <!--Llamamos a la variable que esta en el app/buid.gradle.kts-->
+    <string name="open_route_service_hey" templateMergeStrategy="preserve" translatable="false">
+        5b3ce3597851110001cf6248e6564815347a41768ab3ab3cf1098048
+    </string>
+    
+    
 </resources>
