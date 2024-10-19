@@ -8,6 +8,10 @@ import android.graphics.BitmapFactory
 import android.graphics.Matrix
 import android.os.Bundle
 import android.util.Log
+import android.view.View
+import android.view.inputmethod.InputMethodManager
+import android.widget.EditText
+import android.widget.FrameLayout
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
@@ -54,8 +58,22 @@ class InitialMapActivity : AppCompatActivity(), OnMapReadyCallback, OnMyLocation
         } else {
             requestLocationPermission()  // Esto debería solicitar los permisos
         }
+
     }
 
+    fun showExpandedSearch(view: View) {
+        // Ocultar el EditText original
+        val originalSearchEditText = findViewById<EditText>(R.id.original_search_edit_text)
+        originalSearchEditText.visibility = View.GONE
+
+        // Mostrar el layout expandido
+        val expandedSearchLayout = findViewById<FrameLayout>(R.id.expanded_search_layout)
+        expandedSearchLayout.visibility = View.VISIBLE
+
+        // Enfocar el nuevo EditText en el layout expandido
+        val expandedSearchEditText = findViewById<EditText>(R.id.expanded_search_edit_text)
+        expandedSearchEditText.requestFocus()
+    }
 
 
     private fun createFragment() {
