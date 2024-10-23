@@ -37,8 +37,6 @@ class InitialMapActivity : AppCompatActivity(), OnMapReadyCallback, OnMyLocation
 
     // Variables globales
     private lateinit var map: GoogleMap
-    private var start:String = "-66.17131236994032,-17.379954096571343"//TENEMOS QUE CREAR UNA BASE DE DATOS CON CORRDENADAS DE LAS PARADAS de los trugis
-    private var end:String = "-66.14519448429931,-17.392252179261888"//HACEMOS UN BACK FACIL PERO TENEMOS QUE HACERLO, DESPUES PINTAR ESTAS RUTAS ES FACIL
 
     companion object{
         const val REQUEST_CODE_LOCATION = 0
@@ -142,7 +140,7 @@ class InitialMapActivity : AppCompatActivity(), OnMapReadyCallback, OnMyLocation
         CoroutineScope(Dispatchers.IO).launch {
             try {
                 val request = getBackendRetrofit().create(ApiService::class.java)
-                    .getBackendRoute("203-b")
+                    .getBackendRoute("233-Cha")
 
                 if (request.isSuccessful) {
                     request.body()?.let { response ->
