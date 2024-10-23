@@ -24,6 +24,7 @@ import com.google.android.gms.maps.model.CustomCap
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.PolylineOptions
 import com.softcraft.rutaxpressapp.routes.ApiService
+import com.softcraft.rutaxpressapp.routes.BackendRouteResponse
 import com.softcraft.rutaxpressapp.routes.RouteResponse
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -138,18 +139,21 @@ class InitialMapActivity : AppCompatActivity(), OnMapReadyCallback, OnMyLocation
     }
 
     private fun createRoute() {
-        CoroutineScope(Dispatchers.IO).launch{
-            val request = getRetrofit().create(ApiService::class.java)
-                .getRoute(
-                    "5b3ce3597851110001cf6248e6564815347a41768ab3ab3cf1098048",//Aqui va la API Key, me la piden por privado HIJAS
-                    start,
-                    end
-                )
-            if (request.isSuccessful){
-                drawRoute(request.body())
-                Log.i("alfredoDev","OK")
-            }else{
-                Log.i("alfredoDev","NOT OK")
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                val request = getBackendRetrofit().create(ApiService::class.java)
+                    .getBackendRoute("203-b")
+
+                if (request.isSuccessful) {
+                    request.body()?.let { response ->
+                        drawBackendRoute(response)
+                        Log.i("alfredoDev", "Backend route fetched successfully")
+                    }
+                } else {
+                    Log.e("alfredoDev", "Error fetching route: ${request.errorBody()?.string()}")
+                }
+            } catch (e: Exception) {
+                Log.e("alfredoDev", "Exception fetching route", e)
             }
         }
     }
@@ -158,16 +162,26 @@ class InitialMapActivity : AppCompatActivity(), OnMapReadyCallback, OnMyLocation
      * Hay QUE REFACTORIZAR HIJAS mejor, talque no se haga todo en un archivos, para no afectar la funcionalidad creo como REACT
      */
 
-    private fun drawRoute(routeResponse: RouteResponse?) {
+    private fun drawBackendRoute(routeResponse: BackendRouteResponse) {
         val polylineOptions = PolylineOptions()
-        routeResponse?.features?.get(0)?.geometry?.coordinates?.forEach {
-            polylineOptions.add(LatLng(it[1], it[0]))
+
+        routeResponse.geojson.features.firstOrNull()?.geometry?.coordinates?.forEach { coordinate ->
+            // Convert [longitude, latitude] to LatLng
+            polylineOptions.add(LatLng(coordinate[1], coordinate[0]))
         }
-        runOnUiThread{
+
+        runOnUiThread {
             val poly = map.addPolyline(polylineOptions)
             poly.color = ContextCompat.getColor(this, R.color.routeMap)
             poly.width = 12f
             poly.endCap = CustomCap(resizeIcon(R.drawable.bus, this))
+
+            // Move camera to show the entire route
+            val bounds = com.google.android.gms.maps.model.LatLngBounds.Builder()
+            routeResponse.geojson.features.firstOrNull()?.geometry?.coordinates?.forEach { coordinate ->
+                bounds.include(LatLng(coordinate[1], coordinate[0]))
+            }
+            map.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds.build(), 100))
         }
     }
     private fun resizeIcon(resourceId: Int, context: Context): BitmapDescriptor {
@@ -176,9 +190,9 @@ class InitialMapActivity : AppCompatActivity(), OnMapReadyCallback, OnMyLocation
         return BitmapDescriptorFactory.fromBitmap(scaledBitmap)
     }
 
-    private fun getRetrofit(): Retrofit {
+    private fun getBackendRetrofit(): Retrofit {
         return Retrofit.Builder()
-            .baseUrl("https://api.openrouteservice.org/")
+            .baseUrl("https://ruta-xpress-backend-express-js.vercel.app/")
             .addConverterFactory(GsonConverterFactory.create())
             .build()
     }
