@@ -182,6 +182,4 @@ class InitialMapActivity : AppCompatActivity(), OnMapReadyCallback, OnMyLocation
             .addConverterFactory(GsonConverterFactory.create())
             .build()
     }
-
-
 }
