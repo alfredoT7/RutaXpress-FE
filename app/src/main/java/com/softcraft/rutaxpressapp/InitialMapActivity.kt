@@ -59,6 +59,7 @@ class InitialMapActivity : AppCompatActivity(), OnMapReadyCallback, OnMyLocation
             requestLocationPermission()  // Esto debería solicitar los permisos
         }
 
+        
     }
 
     fun showExpandedSearch(view: View) {
