@@ -6,27 +6,6 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".InitialMapActivity"
     android:orientation="vertical">
-   <!--El buscador que se desplegara-->
-    <FrameLayout
-        android:id="@+id/expanded_search_layout"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@color/white"
-        android:visibility="gone"
-        android:elevation="5dp"
-        android:padding="16dp">
-
-        <EditText
-            android:id="@+id/expanded_search_edit_text"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Seleccionar ubicación..."
-            android:padding="12dp"
-            android:background="@android:color/transparent"
-            android:textSize="16sp" />
-
-    </FrameLayout>
-
 
     <LinearLayout
         android:layout_width="wrap_content"
@@ -74,8 +53,8 @@
             android:layout_height="wrap_content"
             android:layout_marginEnd="20dp"
             android:layout_weight="1"
-            android:elevation="0dp"
-            app:cardBackgroundColor="#DADADA"
+            app:cardElevation="0dp"
+            app:cardBackgroundColor="@color/cv_bg_color"
             app:cardCornerRadius="19dp"
             >
 
@@ -88,7 +67,9 @@
                     android:layout_width="35dp"
                     android:layout_height="35dp"
                     android:layout_margin="10dp"
-                    android:src="@drawable/ic_favorite_marquer">
+                    android:src="@drawable/ic_favorite_marquer"
+                    app:tint="@color/favorite_yellow"
+                    >
 
                 </ImageView>
 
@@ -102,11 +83,14 @@
         </androidx.cardview.widget.CardView>
 
         <androidx.cardview.widget.CardView
+            android:id="@+id/cvBusLines"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            app:cardBackgroundColor="#DADADA"
-            app:cardCornerRadius="19dp">
+            app:cardBackgroundColor="@color/cv_bg_color"
+            app:cardCornerRadius="19dp"
+            app:cardElevation="0dp"
+            >
 
             <LinearLayout
                 android:layout_width="wrap_content"
@@ -117,7 +101,9 @@
                     android:layout_width="35dp"
                     android:layout_height="35dp"
                     android:layout_margin="10dp"
-                    android:src="@drawable/ic_bus_icon">
+                    android:src="@drawable/ic_bus_icon"
+                    app:tint="@color/app_orange"
+                    >
                 </ImageView>
 
                 <TextView
@@ -153,21 +139,21 @@
             android:layout_weight="1"
             app:cardCornerRadius="18dp"
             android:layout_marginTop="10dp"
-            app:cardBackgroundColor="#DADADA"
+            app:cardBackgroundColor="@color/cv_bg_color"
             android:layout_marginStart="20dp"
             android:layout_marginRight="8dp"
             android:layout_marginBottom="10dp"
-            android:elevation="0dp"
+            app:cardElevation="0dp"
             >
             <EditText
-                android:id="@+id/original_search_edit_text"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:hint="@string/search_box_from"
                 android:paddingHorizontal="30dp"
                 android:textSize="15sp"
                 android:background="@android:color/transparent"
-                android:onClick="showExpandedSearch"
+                android:maxLines="1"
+                android:singleLine="true"
                 >
             </EditText>
         </androidx.cardview.widget.CardView>
@@ -200,9 +186,10 @@
         android:layout_height="45dp"
         app:cardCornerRadius="18dp"
         android:layout_marginTop="10dp"
-        app:cardBackgroundColor="#DADADA"
+        app:cardBackgroundColor="@color/cv_bg_color"
         android:layout_marginHorizontal="20dp"
         android:layout_marginBottom="10dp"
+        app:cardElevation="0dp"
         >
         <EditText
             android:layout_width="match_parent"
@@ -211,6 +198,8 @@
             android:paddingHorizontal="30dp"
             android:textSize="15sp"
             android:background="@android:color/transparent"
+            android:maxLines="1"
+            android:singleLine="true"
             >
         </EditText>
     </androidx.cardview.widget.CardView>
@@ -222,7 +211,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/search_btn_text"
-            android:background="@color/btnLoginColor"
+            android:backgroundTint="@color/btnColor"
             android:textColor="@android:color/white"
             android:layout_marginHorizontal="20dp"
             android:layout_marginBottom="10dp"

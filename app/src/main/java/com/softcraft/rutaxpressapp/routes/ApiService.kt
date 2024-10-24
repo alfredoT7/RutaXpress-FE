@@ -3,6 +3,8 @@ package com.softcraft.rutaxpressapp.routes
 import retrofit2.http.GET
 import retrofit2.http.Query
 import retrofit2.Response
+import retrofit2.http.Path
+
 interface ApiService {
     @GET("/v2/directions/driving-car")
     suspend fun getRoute(
@@ -10,4 +12,10 @@ interface ApiService {
         @Query("start", encoded = true) start: String,
         @Query("end", encoded = true) end: String
     ):Response<RouteResponse>
+
+    @GET("routes/{routeId}")
+    suspend fun getBackendRoute(
+        @Path("routeId") routeId: String
+    ): Response<BackendRouteResponse>
+
 }

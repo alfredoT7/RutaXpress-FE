@@ -2,18 +2,16 @@ package com.softcraft.rutaxpressapp
 
 import android.Manifest
 import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Matrix
 import android.os.Bundle
 import android.util.Log
-import android.view.View
-import android.view.inputmethod.InputMethodManager
-import android.widget.EditText
-import android.widget.FrameLayout
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.cardview.widget.CardView
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.google.android.gms.maps.GoogleMap
@@ -28,6 +26,7 @@ import com.google.android.gms.maps.model.CustomCap
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.PolylineOptions
 import com.softcraft.rutaxpressapp.routes.ApiService
+import com.softcraft.rutaxpressapp.routes.BackendRouteResponse
 import com.softcraft.rutaxpressapp.routes.RouteResponse
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -40,8 +39,7 @@ class InitialMapActivity : AppCompatActivity(), OnMapReadyCallback, OnMyLocation
 
     // Variables globales
     private lateinit var map: GoogleMap
-    private var start:String = "-66.17131236994032,-17.379954096571343"//TENEMOS QUE CREAR UNA BASE DE DATOS CON CORRDENADAS DE LAS PARADAS de los trugis
-    private var end:String = "-66.14519448429931,-17.392252179261888"//HACEMOS UN BACK FACIL PERO TENEMOS QUE HACERLO, DESPUES PINTAR ESTAS RUTAS ES FACIL
+    private lateinit var cvBusLines: CardView
 
     companion object{
         const val REQUEST_CODE_LOCATION = 0
@@ -50,7 +48,7 @@ class InitialMapActivity : AppCompatActivity(), OnMapReadyCallback, OnMyLocation
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.initial_map)
-
+        initListeners()
         // Solicitar permisos antes de crear el mapa
         if (isLocationPermissionGranted()) {
             createFragment()
@@ -58,22 +56,15 @@ class InitialMapActivity : AppCompatActivity(), OnMapReadyCallback, OnMyLocation
         } else {
             requestLocationPermission()  // Esto debería solicitar los permisos
         }
-
-        
     }
 
-    fun showExpandedSearch(view: View) {
-        // Ocultar el EditText original
-        val originalSearchEditText = findViewById<EditText>(R.id.original_search_edit_text)
-        originalSearchEditText.visibility = View.GONE
-
-        // Mostrar el layout expandido
-        val expandedSearchLayout = findViewById<FrameLayout>(R.id.expanded_search_layout)
-        expandedSearchLayout.visibility = View.VISIBLE
-
-        // Enfocar el nuevo EditText en el layout expandido
-        val expandedSearchEditText = findViewById<EditText>(R.id.expanded_search_edit_text)
-        expandedSearchEditText.requestFocus()
+    private fun initListeners() {
+        cvBusLines = findViewById(R.id.cvBusLines)
+        cvBusLines.setOnClickListener {
+            // Aquí deberías abrir la actividad de filtrado de líneas
+            val click = Intent(this, LineasFilterActivity::class.java)
+            startActivity(click)
+        }
     }
 
 
@@ -157,18 +148,21 @@ class InitialMapActivity : AppCompatActivity(), OnMapReadyCallback, OnMyLocation
     }
 
     private fun createRoute() {
-        CoroutineScope(Dispatchers.IO).launch{
-            val request = getRetrofit().create(ApiService::class.java)
-                .getRoute(
-                    "",//Aqui va la API Key, me la piden por privado HIJAS
-                    start,
-                    end
-                )
-            if (request.isSuccessful){
-                drawRoute(request.body())
-                Log.i("alfredoDev","OK")
-            }else{
-                Log.i("alfredoDev","NOT OK")
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                val request = getBackendRetrofit().create(ApiService::class.java)
+                    .getBackendRoute("233-cha")
+
+                if (request.isSuccessful) {
+                    request.body()?.let { response ->
+                        drawBackendRoute(response)
+                        Log.i("alfredoDev", "Backend route fetched successfully")
+                    }
+                } else {
+                    Log.e("alfredoDev", "Error fetching route: ${request.errorBody()?.string()}")
+                }
+            } catch (e: Exception) {
+                Log.e("alfredoDev", "Exception fetching route", e)
             }
         }
     }
@@ -177,16 +171,26 @@ class InitialMapActivity : AppCompatActivity(), OnMapReadyCallback, OnMyLocation
      * Hay QUE REFACTORIZAR HIJAS mejor, talque no se haga todo en un archivos, para no afectar la funcionalidad creo como REACT
      */
 
-    private fun drawRoute(routeResponse: RouteResponse?) {
+    private fun drawBackendRoute(routeResponse: BackendRouteResponse) {
         val polylineOptions = PolylineOptions()
-        routeResponse?.features?.get(0)?.geometry?.coordinates?.forEach {
-            polylineOptions.add(LatLng(it[1], it[0]))
+
+        routeResponse.geojson.features.firstOrNull()?.geometry?.coordinates?.forEach { coordinate ->
+            // Convert [longitude, latitude] to LatLng
+            polylineOptions.add(LatLng(coordinate[1], coordinate[0]))
         }
-        runOnUiThread{
+
+        runOnUiThread {
             val poly = map.addPolyline(polylineOptions)
             poly.color = ContextCompat.getColor(this, R.color.routeMap)
             poly.width = 12f
             poly.endCap = CustomCap(resizeIcon(R.drawable.bus, this))
+
+            // Move camera to show the entire route
+            val bounds = com.google.android.gms.maps.model.LatLngBounds.Builder()
+            routeResponse.geojson.features.firstOrNull()?.geometry?.coordinates?.forEach { coordinate ->
+                bounds.include(LatLng(coordinate[1], coordinate[0]))
+            }
+            map.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds.build(), 100))
         }
     }
     private fun resizeIcon(resourceId: Int, context: Context): BitmapDescriptor {
@@ -195,12 +199,10 @@ class InitialMapActivity : AppCompatActivity(), OnMapReadyCallback, OnMyLocation
         return BitmapDescriptorFactory.fromBitmap(scaledBitmap)
     }
 
-    private fun getRetrofit(): Retrofit {
+    private fun getBackendRetrofit(): Retrofit {
         return Retrofit.Builder()
-            .baseUrl("https://api.openrouteservice.org/")
+            .baseUrl("https://ruta-xpress-backend-express-js.vercel.app/")
             .addConverterFactory(GsonConverterFactory.create())
             .build()
     }
-
-
 }
