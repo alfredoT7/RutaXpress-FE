@@ -42,9 +42,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:cardCornerRadius="18dp"
-            app:cardElevation="4dp"
             android:layout_marginTop="10dp"
-            app:cardBackgroundColor="#DADADA"
+            app:cardBackgroundColor="@color/cv_bg_color"
+            app:cardElevation="0dp"
             >
 
             <EditText
@@ -54,15 +54,18 @@
                 android:hint="@string/email_field_text"
                 android:inputType="textEmailAddress"
                 android:padding="10dp"
-                android:background="@android:color/transparent" />
+                android:background="@android:color/transparent"
+                android:maxLines="1"
+                android:singleLine="true"/>
         </androidx.cardview.widget.CardView>
         <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:cardCornerRadius="18dp"
-            app:cardElevation="4dp"
             android:layout_marginTop="20dp"
-            app:cardBackgroundColor="#DADADA">
+            app:cardBackgroundColor="@color/cv_bg_color"
+            app:cardElevation="0dp"
+            >
             <EditText
                 android:id="@+id/etPassword"
                 android:layout_width="match_parent"
@@ -70,7 +73,9 @@
                 android:hint="@string/password_field_text"
                 android:inputType="textEmailAddress"
                 android:padding="10dp"
-                android:background="@android:color/transparent" />
+                android:background="@android:color/transparent"
+                android:maxLines="1"
+                android:singleLine="true"/>
         </androidx.cardview.widget.CardView>
         <TextView
             android:layout_width="wrap_content"
@@ -85,7 +90,7 @@
             android:layout_height="wrap_content"
             android:text="@string/login_button_text"
             android:textColor="@android:color/white"
-            android:backgroundTint="@color/btnLoginColor"
+            android:backgroundTint="@color/btnColor"
             android:layout_marginTop="20dp" />
         <TextView
             android:layout_width="wrap_content"

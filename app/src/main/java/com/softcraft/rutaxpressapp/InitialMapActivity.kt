@@ -2,6 +2,7 @@ package com.softcraft.rutaxpressapp
 
 import android.Manifest
 import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
@@ -10,6 +11,7 @@ import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.cardview.widget.CardView
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.google.android.gms.maps.GoogleMap
@@ -37,8 +39,7 @@ class InitialMapActivity : AppCompatActivity(), OnMapReadyCallback, OnMyLocation
 
     // Variables globales
     private lateinit var map: GoogleMap
-    private var start:String = "-66.17131236994032,-17.379954096571343"//TENEMOS QUE CREAR UNA BASE DE DATOS CON CORRDENADAS DE LAS PARADAS de los trugis
-    private var end:String = "-66.14519448429931,-17.392252179261888"//HACEMOS UN BACK FACIL PERO TENEMOS QUE HACERLO, DESPUES PINTAR ESTAS RUTAS ES FACIL
+    private lateinit var cvBusLines: CardView
 
     companion object{
         const val REQUEST_CODE_LOCATION = 0
@@ -47,7 +48,7 @@ class InitialMapActivity : AppCompatActivity(), OnMapReadyCallback, OnMyLocation
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.initial_map)
-
+        initListeners()
         // Solicitar permisos antes de crear el mapa
         if (isLocationPermissionGranted()) {
             createFragment()
@@ -57,6 +58,14 @@ class InitialMapActivity : AppCompatActivity(), OnMapReadyCallback, OnMyLocation
         }
     }
 
+    private fun initListeners() {
+        cvBusLines = findViewById(R.id.cvBusLines)
+        cvBusLines.setOnClickListener {
+            // Aquí deberías abrir la actividad de filtrado de líneas
+            val click = Intent(this, LineasFilterActivity::class.java)
+            startActivity(click)
+        }
+    }
 
 
     private fun createFragment() {
@@ -142,7 +151,7 @@ class InitialMapActivity : AppCompatActivity(), OnMapReadyCallback, OnMyLocation
         CoroutineScope(Dispatchers.IO).launch {
             try {
                 val request = getBackendRetrofit().create(ApiService::class.java)
-                    .getBackendRoute("203-b")
+                    .getBackendRoute("233-cha")
 
                 if (request.isSuccessful) {
                     request.body()?.let { response ->
