@@ -52,7 +52,10 @@ class InitialMapActivity : AppCompatActivity(), OnMapReadyCallback, OnMyLocation
         // Solicitar permisos antes de crear el mapa
         if (isLocationPermissionGranted()) {
             createFragment()
-            createRoute()
+            val routeId = intent.getStringExtra("routeId")
+            if (routeId != null) {
+                createRoute(routeId)
+            }
         } else {
             requestLocationPermission()  // Esto debería solicitar los permisos
         }
@@ -147,11 +150,11 @@ class InitialMapActivity : AppCompatActivity(), OnMapReadyCallback, OnMyLocation
         return false
     }
 
-    private fun createRoute() {
+    private fun createRoute(routeId: String) {
         CoroutineScope(Dispatchers.IO).launch {
             try {
                 val request = getBackendRetrofit().create(ApiService::class.java)
-                    .getBackendRoute("233-cha")
+                    .getBackendRoute(routeId)
 
                 if (request.isSuccessful) {
                     request.body()?.let { response ->

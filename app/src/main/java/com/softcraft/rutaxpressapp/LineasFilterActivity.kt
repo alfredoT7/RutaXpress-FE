@@ -1,5 +1,6 @@
 package com.softcraft.rutaxpressapp
 
+import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -13,6 +14,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.softcraft.rutaxpressapp.lineas.LineaResponse
 import com.softcraft.rutaxpressapp.lineas.LineasAdapter
+import com.softcraft.rutaxpressapp.lineas.LineasRepository
 import com.softcraft.rutaxpressapp.routes.ApiService
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -30,15 +32,20 @@ class LineasFilterActivity : AppCompatActivity() {
         //enableEdgeToEdge()
         setContentView(R.layout.activity_lineas_filter)
         initComponents()
-        obtenerLineas()
+        if (LineasRepository.lineas == null){
+            obtenerLineas()
+        }else{
+            allLineas = LineasRepository.lineas!!
+            lineasAdapter.submitList(allLineas)
+        }
         initListeners()
     }
 
     private fun initComponents() {
         rvLineas = findViewById(R.id.rvLineas)
         rvLineas.layoutManager = LinearLayoutManager(this)
-        lineasAdapter = LineasAdapter()
-        rvLineas.adapter= lineasAdapter
+        lineasAdapter = LineasAdapter { linea -> onLineaClick(linea) }
+        rvLineas.adapter = lineasAdapter
     }
     private fun obtenerLineas() {
         CoroutineScope(Dispatchers.IO).launch {
@@ -52,6 +59,7 @@ class LineasFilterActivity : AppCompatActivity() {
                 if (response.isSuccessful) {
                     response.body()?.let { lineas ->
                         allLineas = lineas
+                        LineasRepository.lineas = lineas
                         runOnUiThread {
                             lineasAdapter.submitList(lineas)
                         }
@@ -104,6 +112,11 @@ class LineasFilterActivity : AppCompatActivity() {
         runOnUiThread {
             lineasAdapter.submitList(lineasFiltradas)
         }
+    }
+    private fun onLineaClick(linea: LineaResponse) {
+        val intent = Intent(this, InitialMapActivity::class.java)
+        intent.putExtra("routeId", linea.routeId)
+        startActivity(intent)
     }
 
 
