@@ -4,10 +4,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.softcraft.rutaxpressapp.R
 
-class LineasAdapter(private val lineas: List<LineaResponse>) : RecyclerView.Adapter<LineasAdapter.LineaViewHolder>() {
+class LineasAdapter : ListAdapter<LineaResponse, LineasAdapter.LineaViewHolder>(LineaDiffCallback()) {
 
     class LineaViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val tvLineaID: TextView = itemView.findViewById(R.id.tvLineaID)
@@ -21,12 +23,19 @@ class LineasAdapter(private val lineas: List<LineaResponse>) : RecyclerView.Adap
     }
 
     override fun onBindViewHolder(holder: LineaViewHolder, position: Int) {
-        val linea = lineas[position]
+        val linea = getItem(position)
         holder.tvLineaID.text = linea.routeId
         holder.tvLineaDescription.text = linea.description
     }
 
-    override fun getItemCount(): Int {
-        return lineas.size
+    class LineaDiffCallback : DiffUtil.ItemCallback<LineaResponse>() {
+        override fun areItemsTheSame(oldItem: LineaResponse, newItem: LineaResponse): Boolean {
+            return oldItem.routeId == newItem.routeId
+        }
+
+        override fun areContentsTheSame(oldItem: LineaResponse, newItem: LineaResponse): Boolean {
+            return oldItem == newItem
+        }
     }
+
 }

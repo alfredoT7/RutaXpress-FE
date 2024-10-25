@@ -31,12 +31,14 @@
                 >
             </ImageView>
             <EditText
+                android:id="@+id/etSearchId"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:background="@android:color/transparent"
                 android:hint="@string/search_btn_text_filter_routes"
                 android:maxLines="1"
                 android:singleLine="true"
+                android:imeOptions="actionSearch"
                 >
 
             </EditText>
