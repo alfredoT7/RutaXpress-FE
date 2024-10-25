@@ -9,23 +9,34 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.softcraft.rutaxpressapp.R
 
-class LineasAdapter : ListAdapter<LineaResponse, LineasAdapter.LineaViewHolder>(LineaDiffCallback()) {
+class LineasAdapter(private val onItemClick: (LineaResponse) -> Unit) : ListAdapter<LineaResponse, LineasAdapter.LineaViewHolder>(LineaDiffCallback()) {
 
-    class LineaViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val tvLineaID: TextView = itemView.findViewById(R.id.tvLineaID)
-        val tvLineaDescription: TextView = itemView.findViewById(R.id.tvLineaDescription)
+    class LineaViewHolder(itemView: View, val onItemClick: (LineaResponse) -> Unit) : RecyclerView.ViewHolder(itemView) {
+        private val tvLineaID: TextView = itemView.findViewById(R.id.tvLineaID)
+        private val tvLineaDescription: TextView = itemView.findViewById(R.id.tvLineaDescription)
+        private var currentLinea: LineaResponse? = null
+
+        init {
+            itemView.setOnClickListener {
+                currentLinea?.let { onItemClick(it) }
+            }
+        }
+
+        fun bind(linea: LineaResponse) {
+            currentLinea = linea
+            tvLineaID.text = linea.routeId
+            tvLineaDescription.text = linea.description
+        }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): LineaViewHolder {
         val view = LayoutInflater.from(parent.context)
             .inflate(R.layout.item_lineas_card, parent, false)
-        return LineaViewHolder(view)
+        return LineaViewHolder(view, onItemClick)
     }
 
     override fun onBindViewHolder(holder: LineaViewHolder, position: Int) {
-        val linea = getItem(position)
-        holder.tvLineaID.text = linea.routeId
-        holder.tvLineaDescription.text = linea.description
+        holder.bind(getItem(position))
     }
 
     class LineaDiffCallback : DiffUtil.ItemCallback<LineaResponse>() {
@@ -37,5 +48,4 @@ class LineasAdapter : ListAdapter<LineaResponse, LineasAdapter.LineaViewHolder>(
             return oldItem == newItem
         }
     }
-
 }
