@@ -9,6 +9,7 @@ import android.graphics.BitmapFactory
 import android.graphics.Matrix
 import android.os.Bundle
 import android.util.Log
+import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.cardview.widget.CardView
@@ -56,6 +57,12 @@ class InitialMapActivity : AppCompatActivity(), OnMapReadyCallback, OnMyLocation
         } else {
             requestLocationPermission()  // Esto debería solicitar los permisos
         }
+        val searchBoxFrom: EditText = findViewById(R.id.search_box_from)
+        searchBoxFrom.setOnClickListener {
+            val intent = Intent(this, SearchActivity::class.java)
+            startActivity(intent)
+        }
+
     }
 
     private fun initListeners() {
