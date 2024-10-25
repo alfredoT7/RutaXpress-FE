@@ -47,6 +47,7 @@
             android:layout_height="wrap_content"
             android:src="@drawable/ic_eye"
             android:layout_gravity="center"
+            app:tint="@color/teal_700"
             >
         </ImageView>
 
