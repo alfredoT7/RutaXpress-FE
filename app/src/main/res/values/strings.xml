@@ -15,4 +15,5 @@
     <string name="my_ubication">Mi Ubicación</string>
     <string name="search_btn_text">Buscar Trufi</string>
     <string name="search_btn_text_filter_routes">Busca una linea</string>
+    <string name="all_lineas">Todas las lineas</string>
 </resources>
