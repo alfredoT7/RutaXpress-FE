@@ -42,9 +42,17 @@
             </EditText>
         </LinearLayout>
     </androidx.cardview.widget.CardView>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/all_lineas"
+        android:layout_marginTop="10dp"
+        android:textStyle="bold"
+        android:textSize="20sp"
+        />
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvLineas"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"/>
+        android:layout_marginTop="8dp"/>
 </LinearLayout>
