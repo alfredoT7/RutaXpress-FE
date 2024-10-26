@@ -62,7 +62,6 @@ class InitialMapActivity : AppCompatActivity(), OnMapReadyCallback, OnMyLocation
     private fun initListeners() {
         cvBusLines = findViewById(R.id.cvBusLines)
         cvBusLines.setOnClickListener {
-            // Aquí deberías abrir la actividad de filtrado de líneas
             val click = Intent(this, LineasFilterActivity::class.java)
             startActivity(click)
         }
@@ -161,9 +160,9 @@ class InitialMapActivity : AppCompatActivity(), OnMapReadyCallback, OnMyLocation
         }
         runOnUiThread {
             val poly = map.addPolyline(polylineOptions)
-            poly.color = ContextCompat.getColor(this, R.color.routeMap)
+            poly.color = ContextCompat.getColor(this, R.color.btnColor)
             poly.width = 12f
-            poly.endCap = CustomCap(resizeIcon(R.drawable.bus, this))
+            poly.endCap = CustomCap(resizeIcon(R.drawable.bus, this, 50, 50))
             // Obtener la ubicación actual
             if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
                 val fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
@@ -178,7 +177,7 @@ class InitialMapActivity : AppCompatActivity(), OnMapReadyCallback, OnMyLocation
                                 MarkerOptions()
                                     .position(closestPoint)
                                     .title("Parada más cercana")
-                                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN))
+                                    .icon(resizeIcon(R.drawable.bus_stop, this, 100, 100))
                             )
                             val bounds = LatLngBounds.Builder()
                                 .include(userLocation)
@@ -193,9 +192,9 @@ class InitialMapActivity : AppCompatActivity(), OnMapReadyCallback, OnMyLocation
             }
         }
     }
-    private fun resizeIcon(resourceId: Int, context: Context): BitmapDescriptor {
+    private fun resizeIcon(resourceId: Int, context: Context, width: Int, height: Int): BitmapDescriptor {
         val imageBitmap = BitmapFactory.decodeResource(context.resources, resourceId)
-        val scaledBitmap = Bitmap.createScaledBitmap(imageBitmap, 50, 50, false)
+        val scaledBitmap = Bitmap.createScaledBitmap(imageBitmap, width, height, false)
         return BitmapDescriptorFactory.fromBitmap(scaledBitmap)
     }
     private fun getBackendRetrofit(): Retrofit {
