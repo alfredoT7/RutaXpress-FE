@@ -1,9 +1,13 @@
 package com.softcraft.rutaxpressapp
 
+import android.Manifest
+import android.content.pm.PackageManager
 import android.os.Bundle
 import android.widget.ImageView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import com.google.android.gms.common.api.Status
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
@@ -20,12 +24,12 @@ class SearchActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private lateinit var autocompleteFragment: AutocompleteSupportFragment
     private lateinit var googleMap: GoogleMap  // Variable para el Google Map
+    private lateinit var userLocation: LatLng
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.search_screen)
 
-        // Inicializar Places API
         Places.initialize(applicationContext, getString(R.string.google_maps_key))
 
         // Configurar el fragmento de autocompletado
@@ -34,6 +38,10 @@ class SearchActivity : AppCompatActivity(), OnMapReadyCallback {
         autocompleteFragment.setPlaceFields(
             listOf(Place.Field.ID, Place.Field.ADDRESS, Place.Field.LAT_LNG)
         )
+
+        val latitude = intent.getDoubleExtra("LATITUDE", -34.0) // Valor por defecto
+        val longitude = intent.getDoubleExtra("LONGITUDE", 151.0) // Valor por defecto
+        userLocation = LatLng(latitude,longitude)
 
         autocompleteFragment.setOnPlaceSelectedListener(object : PlaceSelectionListener {
             override fun onPlaceSelected(place: Place) {
@@ -63,8 +71,22 @@ class SearchActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     override fun onMapReady(map: GoogleMap) {
-        googleMap = map  // Asigna el mapa cuando esté listo
-        googleMap.uiSettings.isZoomControlsEnabled = true  // Habilita controles de zoom, opcional
+        googleMap = map
+        googleMap.uiSettings.isZoomControlsEnabled = true  // Controles de zoom
+        // Centra el mapa en la ubicación del usuario recibida
+        map.moveCamera(CameraUpdateFactory.newLatLngZoom(userLocation, 15f))
+
+        // Habilita la capa de ubicación si los permisos ya están concedidos
+        try{
+            enableLocation()
+        }catch(Any: Exception){
+            Toast.makeText(this@SearchActivity, "Error en mostrar ubicacion actual", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun enableLocation() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            googleMap.isMyLocationEnabled = true
+        }
     }
 }
-

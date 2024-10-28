@@ -50,6 +50,7 @@ class InitialMapActivity : AppCompatActivity(), OnMapReadyCallback, OnMyLocation
         super.onCreate(savedInstanceState)
         setContentView(R.layout.initial_map)
         initListeners()
+
         // Solicitar permisos antes de crear el mapa
         if (isLocationPermissionGranted()) {
             createFragment()
@@ -57,13 +58,28 @@ class InitialMapActivity : AppCompatActivity(), OnMapReadyCallback, OnMyLocation
         } else {
             requestLocationPermission()  // Esto debería solicitar los permisos
         }
+
         val searchBoxFrom: EditText = findViewById(R.id.search_box_from)
         searchBoxFrom.setOnClickListener {
             val intent = Intent(this, SearchActivity::class.java)
-            startActivity(intent)
-        }
 
+            // Intentamos obtener la última ubicación conocida
+            val fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
+            fusedLocationClient.lastLocation.addOnSuccessListener { location ->
+                if (location != null) {
+                    // Si la ubicación es válida, pasamos latitud y longitud en el Intent
+                    intent.putExtra("LATITUDE", location.latitude)
+                    intent.putExtra("LONGITUDE", location.longitude)
+                }
+                // Iniciamos `SearchActivity` ya sea con o sin coordenadas
+                startActivity(intent)
+            }.addOnFailureListener {
+                // Si hay un error al obtener la ubicación, solo lanzamos la actividad sin extras
+                startActivity(intent)
+            }
+        }
     }
+
 
     private fun initListeners() {
         cvBusLines = findViewById(R.id.cvBusLines)
