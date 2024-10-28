@@ -23,7 +23,7 @@ import com.google.android.libraries.places.widget.listener.PlaceSelectionListene
 class SearchActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private lateinit var autocompleteFragment: AutocompleteSupportFragment
-    private lateinit var googleMap: GoogleMap  // Variable para el Google Map
+    private lateinit var googleMap: GoogleMap
     private lateinit var userLocation: LatLng
 
     override fun onCreate(savedInstanceState: Bundle?) {
