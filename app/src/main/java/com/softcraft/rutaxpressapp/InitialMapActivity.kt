@@ -27,9 +27,11 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.CustomCap
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
+import com.google.android.gms.maps.model.LatLngBounds
 import com.google.android.gms.maps.model.PolylineOptions
 import com.softcraft.rutaxpressapp.routes.ApiService
 import com.softcraft.rutaxpressapp.routes.BackendRouteResponse
+import com.softcraft.rutaxpressapp.routes.CalculadoraDist
 import com.softcraft.rutaxpressapp.routes.RouteResponse
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -39,25 +41,23 @@ import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.create
 
 class InitialMapActivity : AppCompatActivity(), OnMapReadyCallback, OnMyLocationButtonClickListener {
-
-    // Variables globales
     private lateinit var map: GoogleMap
     private lateinit var cvBusLines: CardView
-
     companion object{
         const val REQUEST_CODE_LOCATION = 0
         private const val REQUEST_CODE_SEARCH_ACTIVITY = 1
     }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.initial_map)
         initListeners()
-
         // Solicitar permisos antes de crear el mapa
         if (isLocationPermissionGranted()) {
             createFragment()
-            createRoute()
+            val routeId = intent.getStringExtra("routeId")
+            if (routeId != null) {
+                createRoute(routeId)
+            }
         } else {
             requestLocationPermission()  // Esto debería solicitar los permisos
         }
@@ -82,7 +82,6 @@ class InitialMapActivity : AppCompatActivity(), OnMapReadyCallback, OnMyLocation
             }
         }
     }
-
     private fun initListeners() {
         cvBusLines = findViewById(R.id.cvBusLines)
         cvBusLines.setOnClickListener {
@@ -157,7 +156,6 @@ class InitialMapActivity : AppCompatActivity(), OnMapReadyCallback, OnMyLocation
             REQUEST_CODE_LOCATION
         )
     }
-
     override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<out String>,
@@ -187,13 +185,11 @@ class InitialMapActivity : AppCompatActivity(), OnMapReadyCallback, OnMyLocation
         Toast.makeText(this, "Botón de ubicación pulsado", Toast.LENGTH_SHORT).show()
         return false
     }
-
-    private fun createRoute() {
+    private fun createRoute(routeId: String) {
         CoroutineScope(Dispatchers.IO).launch {
             try {
                 val request = getBackendRetrofit().create(ApiService::class.java)
-                    .getBackendRoute("233-cha")
-
+                    .getBackendRoute(routeId)
                 if (request.isSuccessful) {
                     request.body()?.let { response ->
                         drawBackendRoute(response)
@@ -207,36 +203,49 @@ class InitialMapActivity : AppCompatActivity(), OnMapReadyCallback, OnMyLocation
             }
         }
     }
-
-    /**
-     * Hay QUE REFACTORIZAR HIJAS mejor, talque no se haga todo en un archivos, para no afectar la funcionalidad creo como REACT
-     */
-
     private fun drawBackendRoute(routeResponse: BackendRouteResponse) {
         val polylineOptions = PolylineOptions()
-
         routeResponse.geojson.features.firstOrNull()?.geometry?.coordinates?.forEach { coordinate ->
-            // Convert [longitude, latitude] to LatLng
             polylineOptions.add(LatLng(coordinate[1], coordinate[0]))
         }
 
         runOnUiThread {
             val poly = map.addPolyline(polylineOptions)
-            poly.color = ContextCompat.getColor(this, R.color.routeMap)
+            poly.color = ContextCompat.getColor(this, R.color.btnColor)
             poly.width = 12f
-            poly.endCap = CustomCap(resizeIcon(R.drawable.bus, this))
-
-            // Move camera to show the entire route
-            val bounds = com.google.android.gms.maps.model.LatLngBounds.Builder()
-            routeResponse.geojson.features.firstOrNull()?.geometry?.coordinates?.forEach { coordinate ->
-                bounds.include(LatLng(coordinate[1], coordinate[0]))
+            poly.endCap = CustomCap(resizeIcon(R.drawable.bus, this, 50, 50))
+            // Obtener la ubicación actual
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                val fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
+                fusedLocationClient.lastLocation.addOnSuccessListener { location ->
+                    if (location != null) {
+                        val userLocation = LatLng(location.latitude, location.longitude)
+                        val coordinates = routeResponse.geojson.features.firstOrNull()?.geometry?.coordinates
+                        if (coordinates != null) {
+                            val closestPoint = findClosestPointOnPolyline(userLocation, coordinates)
+                            // Agregar un marcador en el punto más cercano
+                            map.addMarker(
+                                MarkerOptions()
+                                    .position(closestPoint)
+                                    .title("Parada más cercana")
+                                    .icon(resizeIcon(R.drawable.bus_stop, this, 100, 100))
+                            )
+                            val bounds = LatLngBounds.Builder()
+                                .include(userLocation)
+                                .include(closestPoint)
+                            coordinates.forEach { coordinate ->
+                                bounds.include(LatLng(coordinate[1], coordinate[0]))
+                            }
+                            map.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds.build(), 100))
+                        }
+                    }
+                }
             }
-            map.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds.build(), 100))
         }
     }
-    private fun resizeIcon(resourceId: Int, context: Context): BitmapDescriptor {
+    private fun resizeIcon(resourceId: Int, context: Context, width: Int, height: Int): BitmapDescriptor {
         val imageBitmap = BitmapFactory.decodeResource(context.resources, resourceId)
-        val scaledBitmap = Bitmap.createScaledBitmap(imageBitmap, 50, 50, false)
+        val scaledBitmap = Bitmap.createScaledBitmap(imageBitmap, width, height, false)
         return BitmapDescriptorFactory.fromBitmap(scaledBitmap)
     }
 
@@ -245,5 +254,48 @@ class InitialMapActivity : AppCompatActivity(), OnMapReadyCallback, OnMyLocation
             .baseUrl("https://ruta-xpress-backend-express-js.vercel.app/")
             .addConverterFactory(GsonConverterFactory.create())
             .build()
+    }
+    fun findClosestPointOnPolyline(userLocation: LatLng, coordinates: List<List<Double>>): LatLng {
+        var closestPoint = LatLng(coordinates[0][1], coordinates[0][0])
+        var minDistance = Float.MAX_VALUE
+        for (i in 0 until coordinates.size - 1) {
+            val start = LatLng(coordinates[i][1], coordinates[i][0])
+            val end = LatLng(coordinates[i + 1][1], coordinates[i + 1][0])
+
+            val closestPointOnSegment = findClosestPointOnSegment(userLocation, start, end)
+
+            val results = FloatArray(1)
+            android.location.Location.distanceBetween(
+                userLocation.latitude, userLocation.longitude,
+                closestPointOnSegment.latitude, closestPointOnSegment.longitude,
+                results
+            )
+            if (results[0] < minDistance) {
+                minDistance = results[0]
+                closestPoint = closestPointOnSegment
+            }
+        }
+
+        return closestPoint
+    }
+
+    private fun findClosestPointOnSegment(p: LatLng, start: LatLng, end: LatLng): LatLng {
+        val dx = end.longitude - start.longitude
+        val dy = end.latitude - start.latitude
+
+        if (dx == 0.0 && dy == 0.0) {
+            return start
+        }
+
+        val t = ((p.longitude - start.longitude) * dx + (p.latitude - start.latitude) * dy) /
+                (dx * dx + dy * dy)
+
+        if (t < 0) return start
+        if (t > 1) return end
+
+        return LatLng(
+            start.latitude + t * dy,
+            start.longitude + t * dx
+        )
     }
 }
