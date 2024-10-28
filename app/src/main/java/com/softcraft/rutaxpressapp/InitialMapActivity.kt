@@ -100,6 +100,7 @@ class InitialMapActivity : AppCompatActivity(), OnMapReadyCallback, OnMyLocation
             requestLocationPermission()
         }
     }
+
     private fun requestLocationPermission() {
         // Mostrar la solicitud de permiso al usuario
         ActivityCompat.requestPermissions(

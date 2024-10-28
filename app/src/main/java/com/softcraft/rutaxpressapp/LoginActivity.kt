@@ -25,6 +25,7 @@ class LoginActivity : AppCompatActivity() {
         initListeners()
     }
     private fun initComponents() {
+
         //etUsername = findViewById(R.id.etUsername)
         //etPassword = findViewById(R.id.etPassword)
         btnLogin = findViewById(R.id.btnLogin)
