@@ -33,6 +33,7 @@
             </intent-filter>
         </activity> <!-- Actividad del mapa -->
         <activity android:name=".InitialMapActivity" />
+        <activity android:name=".SearchActivity" />
     </application>
 
 </manifest>

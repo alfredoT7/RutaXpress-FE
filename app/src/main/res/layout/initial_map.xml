@@ -146,6 +146,7 @@
             app:cardElevation="0dp"
             >
             <EditText
+                android:id="@+id/search_box_from"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:hint="@string/search_box_from"
@@ -157,6 +158,8 @@
                 >
             </EditText>
         </androidx.cardview.widget.CardView>
+
+
         <androidx.appcompat.widget.AppCompatButton
             android:layout_width="0dp"
             android:layout_height="55dp"

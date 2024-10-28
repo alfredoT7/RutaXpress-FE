@@ -1,6 +1,7 @@
 package com.softcraft.rutaxpressapp
 
 import android.Manifest
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -9,6 +10,7 @@ import android.graphics.BitmapFactory
 import android.graphics.Matrix
 import android.os.Bundle
 import android.util.Log
+import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.cardview.widget.CardView
@@ -24,8 +26,8 @@ import com.google.android.gms.maps.model.BitmapDescriptor
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.CustomCap
 import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.LatLngBounds
 import com.google.android.gms.maps.model.MarkerOptions
+import com.google.android.gms.maps.model.LatLngBounds
 import com.google.android.gms.maps.model.PolylineOptions
 import com.softcraft.rutaxpressapp.routes.ApiService
 import com.softcraft.rutaxpressapp.routes.BackendRouteResponse
@@ -43,6 +45,7 @@ class InitialMapActivity : AppCompatActivity(), OnMapReadyCallback, OnMyLocation
     private lateinit var cvBusLines: CardView
     companion object{
         const val REQUEST_CODE_LOCATION = 0
+        private const val REQUEST_CODE_SEARCH_ACTIVITY = 1
     }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -58,21 +61,45 @@ class InitialMapActivity : AppCompatActivity(), OnMapReadyCallback, OnMyLocation
         } else {
             requestLocationPermission()  // Esto debería solicitar los permisos
         }
+
+        val searchBoxFrom: EditText = findViewById(R.id.search_box_from)
+        searchBoxFrom.setOnClickListener {
+            val intent = Intent(this, SearchActivity::class.java)
+
+            // Intentamos obtener la última ubicación conocida
+            val fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
+            fusedLocationClient.lastLocation.addOnSuccessListener { location ->
+                if (location != null) {
+                    // Si la ubicación es válida, pasamos latitud y longitud en el Intent
+                    intent.putExtra("LATITUDE", location.latitude)
+                    intent.putExtra("LONGITUDE", location.longitude)
+                }
+                // Iniciamos `SearchActivity` ya sea con o sin coordenadas
+                startActivityForResult(intent, REQUEST_CODE_SEARCH_ACTIVITY)
+            }.addOnFailureListener {
+                // solo lanzamos la actividad sin extras
+                startActivityForResult(intent, REQUEST_CODE_SEARCH_ACTIVITY)
+            }
+        }
     }
     private fun initListeners() {
         cvBusLines = findViewById(R.id.cvBusLines)
         cvBusLines.setOnClickListener {
+            // Aquí deberías abrir la actividad de filtrado de líneas
             val click = Intent(this, LineasFilterActivity::class.java)
             startActivity(click)
         }
     }
+
     private fun createFragment() {
         val mapFragment: SupportMapFragment = supportFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this) // implementamos OnMapReadyCallback
     }
+
     override fun onMapReady(googleMap: GoogleMap) {
         map = googleMap
         map.setOnMyLocationButtonClickListener(this)
+
         // Intentamos obtener la ubicación actual
         if (isLocationPermissionGranted()) {
             enableLocation()
@@ -90,8 +117,28 @@ class InitialMapActivity : AppCompatActivity(), OnMapReadyCallback, OnMyLocation
             map.moveCamera(CameraUpdateFactory.newLatLngZoom(defaultLocation, 10f)) // Ajusta el zoom según tu preferencia
         }
     }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        if (requestCode == REQUEST_CODE_SEARCH_ACTIVITY && resultCode == Activity.RESULT_OK) {
+            val selectedLatitude = data?.getDoubleExtra("SELECTED_LATITUDE", -1.0)
+            val selectedLongitude = data?.getDoubleExtra("SELECTED_LONGITUDE", -1.0)
+            val selectedAddress = data?.getStringExtra("SELECTED_ADDRESS")
+
+            if (selectedLatitude != null && selectedLongitude != null) {
+                // Mueve tu mapa a la ubicación seleccionada
+                val selectedLocation = LatLng(selectedLatitude, selectedLongitude)
+                map.clear() // Limpiar marcadores existentes
+                map.addMarker(MarkerOptions().position(selectedLocation).title(selectedAddress))
+                map.moveCamera(CameraUpdateFactory.newLatLngZoom(selectedLocation, 15f))
+            }
+        }
+    }
+
     private fun isLocationPermissionGranted() =
         ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
+
     private fun enableLocation() {
         if (!::map.isInitialized) return
         if (isLocationPermissionGranted()) {
@@ -124,6 +171,7 @@ class InitialMapActivity : AppCompatActivity(), OnMapReadyCallback, OnMyLocation
             }
         }
     }
+
     override fun onResumeFragments() {
         super.onResumeFragments()
         if (!::map.isInitialized) return
@@ -132,6 +180,7 @@ class InitialMapActivity : AppCompatActivity(), OnMapReadyCallback, OnMyLocation
             Toast.makeText(this, "Acepta los permisos de localización", Toast.LENGTH_SHORT).show()
         }
     }
+
     override fun onMyLocationButtonClick(): Boolean {
         Toast.makeText(this, "Botón de ubicación pulsado", Toast.LENGTH_SHORT).show()
         return false
@@ -159,6 +208,7 @@ class InitialMapActivity : AppCompatActivity(), OnMapReadyCallback, OnMyLocation
         routeResponse.geojson.features.firstOrNull()?.geometry?.coordinates?.forEach { coordinate ->
             polylineOptions.add(LatLng(coordinate[1], coordinate[0]))
         }
+
         runOnUiThread {
             val poly = map.addPolyline(polylineOptions)
             poly.color = ContextCompat.getColor(this, R.color.btnColor)
@@ -198,6 +248,7 @@ class InitialMapActivity : AppCompatActivity(), OnMapReadyCallback, OnMyLocation
         val scaledBitmap = Bitmap.createScaledBitmap(imageBitmap, width, height, false)
         return BitmapDescriptorFactory.fromBitmap(scaledBitmap)
     }
+
     private fun getBackendRetrofit(): Retrofit {
         return Retrofit.Builder()
             .baseUrl("https://ruta-xpress-backend-express-js.vercel.app/")
