@@ -26,7 +26,6 @@ class LineasFilterActivity : AppCompatActivity() {
     private lateinit var rvLineas: RecyclerView
     private lateinit var lineasAdapter: LineasAdapter
     private var allLineas: List<LineaResponse> = emptyList()
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         //enableEdgeToEdge()
@@ -40,7 +39,6 @@ class LineasFilterActivity : AppCompatActivity() {
         }
         initListeners()
     }
-
     private fun initComponents() {
         rvLineas = findViewById(R.id.rvLineas)
         rvLineas.layoutManager = LinearLayoutManager(this)
@@ -78,8 +76,6 @@ class LineasFilterActivity : AppCompatActivity() {
             }
         }
     }
-
-
     private fun initListeners() {
         val etSearchId: EditText = findViewById(R.id.etSearchId)
         etSearchId.setOnEditorActionListener { v, actionId, event ->
@@ -93,7 +89,6 @@ class LineasFilterActivity : AppCompatActivity() {
                 false
             }
         }
-
         etSearchId.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
 
@@ -106,7 +101,6 @@ class LineasFilterActivity : AppCompatActivity() {
             override fun afterTextChanged(s: Editable?) {}
         })
     }
-
     private fun filtrarLineas(id: String) {
         val lineasFiltradas = allLineas.filter { it.routeId.contains(id, ignoreCase = true) }
         runOnUiThread {
@@ -118,6 +112,4 @@ class LineasFilterActivity : AppCompatActivity() {
         intent.putExtra("routeId", linea.routeId)
         startActivity(intent)
     }
-
-
 }
