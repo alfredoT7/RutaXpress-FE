@@ -1,6 +1,7 @@
 package com.softcraft.rutaxpressapp
 
 import android.Manifest
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -25,6 +26,7 @@ import com.google.android.gms.maps.model.BitmapDescriptor
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.CustomCap
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.gms.maps.model.PolylineOptions
 import com.softcraft.rutaxpressapp.routes.ApiService
 import com.softcraft.rutaxpressapp.routes.BackendRouteResponse
@@ -44,6 +46,7 @@ class InitialMapActivity : AppCompatActivity(), OnMapReadyCallback, OnMyLocation
 
     companion object{
         const val REQUEST_CODE_LOCATION = 0
+        private const val REQUEST_CODE_SEARCH_ACTIVITY = 1
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -72,14 +75,13 @@ class InitialMapActivity : AppCompatActivity(), OnMapReadyCallback, OnMyLocation
                     intent.putExtra("LONGITUDE", location.longitude)
                 }
                 // Iniciamos `SearchActivity` ya sea con o sin coordenadas
-                startActivity(intent)
+                startActivityForResult(intent, REQUEST_CODE_SEARCH_ACTIVITY)
             }.addOnFailureListener {
-                // Si hay un error al obtener la ubicación, solo lanzamos la actividad sin extras
-                startActivity(intent)
+                // solo lanzamos la actividad sin extras
+                startActivityForResult(intent, REQUEST_CODE_SEARCH_ACTIVITY)
             }
         }
     }
-
 
     private fun initListeners() {
         cvBusLines = findViewById(R.id.cvBusLines)
@@ -89,7 +91,6 @@ class InitialMapActivity : AppCompatActivity(), OnMapReadyCallback, OnMyLocation
             startActivity(click)
         }
     }
-
 
     private fun createFragment() {
         val mapFragment: SupportMapFragment = supportFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
@@ -118,6 +119,23 @@ class InitialMapActivity : AppCompatActivity(), OnMapReadyCallback, OnMyLocation
         }
     }
 
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        if (requestCode == REQUEST_CODE_SEARCH_ACTIVITY && resultCode == Activity.RESULT_OK) {
+            val selectedLatitude = data?.getDoubleExtra("SELECTED_LATITUDE", -1.0)
+            val selectedLongitude = data?.getDoubleExtra("SELECTED_LONGITUDE", -1.0)
+            val selectedAddress = data?.getStringExtra("SELECTED_ADDRESS")
+
+            if (selectedLatitude != null && selectedLongitude != null) {
+                // Mueve tu mapa a la ubicación seleccionada
+                val selectedLocation = LatLng(selectedLatitude, selectedLongitude)
+                map.clear() // Limpiar marcadores existentes
+                map.addMarker(MarkerOptions().position(selectedLocation).title(selectedAddress))
+                map.moveCamera(CameraUpdateFactory.newLatLngZoom(selectedLocation, 15f))
+            }
+        }
+    }
 
     private fun isLocationPermissionGranted() =
         ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED

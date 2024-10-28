@@ -1,12 +1,12 @@
 package com.softcraft.rutaxpressapp
 
 import android.Manifest
+import android.app.Activity
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
-import android.widget.ImageView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.google.android.gms.common.api.Status
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -25,6 +25,7 @@ class SearchActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var autocompleteFragment: AutocompleteSupportFragment
     private lateinit var googleMap: GoogleMap
     private lateinit var userLocation: LatLng
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -48,9 +49,13 @@ class SearchActivity : AppCompatActivity(), OnMapReadyCallback {
                 val latLng = place.latLng
                 // Mueve el mapa al lugar seleccionado y añade un marcador
                 if (latLng != null) {
-                    googleMap.clear()  // Limpia marcadores anteriores
-                    googleMap.addMarker(MarkerOptions().position(latLng).title(place.address))
-                    googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15f))
+                    //Intent para regresar a InitialMapActivity con sus datos
+                    val returnIntent = Intent()
+                    returnIntent.putExtra("SELECTED_LATITUDE", latLng.latitude)
+                    returnIntent.putExtra("SELECTED_LONGITUDE", latLng.longitude)
+                    returnIntent.putExtra("SELECTED_ADDRESS", place.address)
+                    setResult(Activity.RESULT_OK, returnIntent)
+                    finish()
                 }
             }
 
@@ -63,11 +68,6 @@ class SearchActivity : AppCompatActivity(), OnMapReadyCallback {
         val mapFragment = supportFragmentManager.findFragmentById(R.id.mapSearch) as SupportMapFragment
         mapFragment.getMapAsync(this)  // Obtén el mapa de forma asíncrona
 
-        // Configurar la flecha de regreso
-//        val backArrowIcon: ImageView = findViewById(R.id.back_arrow_icon)
-//        backArrowIcon.setOnClickListener {
-//            finish()  // Finaliza la actividad actual para regresar
-//        }
     }
 
     override fun onMapReady(map: GoogleMap) {
