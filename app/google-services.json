@@ -7,6 +7,35 @@
   "client": [
     {
       "client_info": {
+        "mobilesdk_app_id": "1:142832195453:android:6707ab0b7f3dcae81d1e14",
+        "android_client_info": {
+          "package_name": "com.softcraft.rutaxpressapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "142832195453-8641gq34a9gn0lmd133ud7ub69p6deid.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAMpwddXFk-sH08Q5_XiwBL0jk3ek8h4tQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "142832195453-8641gq34a9gn0lmd133ud7ub69p6deid.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
         "mobilesdk_app_id": "1:142832195453:android:04edfa175bd1b8cf1d1e14",
         "android_client_info": {
           "package_name": "rutaXpress.login"

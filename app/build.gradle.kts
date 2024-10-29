@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
     alias(libs.plugins.googleService)
+    alias(libs.plugins.google.firebase.crashlytics)
 }
 
 android {
@@ -51,11 +52,13 @@ dependencies {
     implementation(libs.androidx.constraintlayout)
     implementation(libs.play.services.location)
     implementation(libs.firebaseAuth)
-    implementation(libs.firebaseStore)
     implementation(libs.firebaseStorage)
+    implementation(libs.firebaseStore)
+    implementation(libs.firebaseAnalitics)
     implementation(libs.retrofit)
     implementation(libs.corrutines)
     implementation(libs.gson)
+    implementation(libs.firebase.crashlytics)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
