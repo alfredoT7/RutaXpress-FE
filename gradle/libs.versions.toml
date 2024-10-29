@@ -11,6 +11,13 @@ activity = "1.9.2"
 constraintlayout = "2.1.4"
 google-maps = "17.0.0"
 playServicesLocation = "21.3.0"
+googleServiceVersion = "4.4.2"
+firebaseAuthV = "23.1.0"
+firebaseStoreV = "25.1.1"
+firebaseStorageV = "21.0.1"
+firebaseAnalytics = "22.1.2"
+firebaseCrashlytics = "19.2.1"
+googleFirebaseCrashlytics = "3.0.2"
 google_places = "3.1.0"
 
 [libraries]
@@ -24,13 +31,22 @@ androidx-activity = { group = "androidx.activity", name = "activity", version.re
 androidx-constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "constraintlayout" }
 maps = { module = "com.google.android.gms:play-services-maps", version.ref = "google-maps" }
 play-services-location = { group = "com.google.android.gms", name = "play-services-location", version.ref = "playServicesLocation" }
+
+
 corrutines = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version = "1.7.3" }
 retrofit = { group = "com.squareup.retrofit2", name = "retrofit", version = "2.9.0" }
 gson = { group = "com.squareup.retrofit2", name = "converter-gson", version = "2.9.0" }
+firebaseAuth = {group = "com.google.firebase", name = "firebase-auth-ktx", version.ref = "firebaseAuthV"}
+firebaseStorage = {group = "com.google.firebase", name = "firebase-storage", version.ref = "firebaseStorageV" }
+firebaseStore = {group = "com.google.firebase", name = "firebase-firestore", version.ref = "firebaseStoreV" }
+firebaseAnalitics = {group = "com.google.firebase", name = "firebase-analytics-ktx", version.ref = "firebaseAnalytics"}
+firebase-crashlytics = { group = "com.google.firebase", name = "firebase-crashlytics", version.ref = "firebaseCrashlytics" }
 places = { module = "com.google.android.libraries.places:places", version.ref = "google_places" }
 
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 jetbrains-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+googleService={id = "com.google.gms.google-services", version.ref = "googleServiceVersion"}
+google-firebase-crashlytics = { id = "com.google.firebase.crashlytics", version.ref = "googleFirebaseCrashlytics" }
 

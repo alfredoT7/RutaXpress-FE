@@ -1,6 +1,13 @@
 <resources>
     <string name="app_name">RutaXpressApp</string>
     <string name="login_tittle">Bienvenido!</string>
+    <string name="register">Regístrate</string>
+    <string name="name">Nombre</string>
+    <string name="last_name">Apellido</string>
+    <string name="phone">Teléfono</string>
+    <string name="direction">Direccion</string>
+    <string name="year">Edad</string>
+    <string name="register_button_text">Registrarse</string>
     <string name="email_field_text">Correo Electrónico</string>
     <string name="password_field_text">Contraseña</string>
     <string name="forgot_password">Olvidaste tu contraseña</string>
