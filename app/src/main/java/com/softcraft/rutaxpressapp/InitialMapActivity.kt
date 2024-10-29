@@ -8,6 +8,8 @@ import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Matrix
+import android.location.Address
+import android.location.Geocoder
 import android.os.Bundle
 import android.util.Log
 import android.widget.EditText
@@ -40,12 +42,15 @@ import kotlinx.coroutines.launch
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.create
+import java.io.IOException
+import java.util.Locale
 
 class InitialMapActivity : AppCompatActivity(), OnMapReadyCallback, OnMyLocationButtonClickListener {
     private lateinit var map: GoogleMap
     private lateinit var cvBusLines: CardView
     private lateinit var cvWhereYouGoFrom: CardView
     private lateinit var cvWhereYouGoTo: CardView
+    private lateinit var tvCurrentPlace: TextView
     companion object{
         const val REQUEST_CODE_LOCATION = 0
         private const val REQUEST_CODE_SEARCH_ACTIVITY = 1
@@ -70,6 +75,7 @@ class InitialMapActivity : AppCompatActivity(), OnMapReadyCallback, OnMyLocation
         cvBusLines = findViewById(R.id.cvBusLines)
         cvWhereYouGoFrom = findViewById(R.id.cvWhereYouGoFrom)
         cvWhereYouGoTo = findViewById(R.id.cvWhereYouGoTo)
+
         cvBusLines.setOnClickListener {
             // Aquí deberías abrir la actividad de filtrado de líneas
             val click = Intent(this, LineasFilterActivity::class.java)
@@ -81,7 +87,7 @@ class InitialMapActivity : AppCompatActivity(), OnMapReadyCallback, OnMyLocation
         cvWhereYouGoTo.setOnClickListener{
             navigateToSearchActivity()
         }
-
+        headerPlace()
 
     }
     fun navigateToSearchActivity(){
@@ -105,6 +111,45 @@ class InitialMapActivity : AppCompatActivity(), OnMapReadyCallback, OnMyLocation
     private fun createFragment() {
         val mapFragment: SupportMapFragment = supportFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this) // implementamos OnMapReadyCallback
+    }
+
+    private fun headerPlace() {
+        val fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
+        tvCurrentPlace = findViewById(R.id.tvCurrentPlace)
+        if (isLocationPermissionGranted()) {
+            fusedLocationClient.lastLocation.addOnSuccessListener { location ->
+                if (location != null) {
+                    val geocoder = Geocoder(this, Locale.getDefault())
+                    try {
+                        val addresses: MutableList<Address>? = geocoder.getFromLocation(location.latitude, location.longitude, 1)
+                        if (addresses != null) {
+                            if (addresses.isNotEmpty()) {
+                                val address: Address = addresses.get(0) ?: return@addOnSuccessListener
+                                var addressText:String = address.getAddressLine(0)
+                                val arr: List<String> = addressText.split(",")
+
+                                if (arr.size > 1) {
+                                    var p1:String = arr[1]
+                                    var p2:String = arr[2]
+                                    tvCurrentPlace.text = "$p1, $p2"
+                                } else {
+                                    tvCurrentPlace.text = "Dirección no disponible"
+                                }
+                            } else {
+                                tvCurrentPlace.text = "Dirección no disponible"
+                            }
+                        }
+                    } catch (e: IOException) {
+                        e.printStackTrace()
+                        tvCurrentPlace.text = "Error al obtener la dirección"
+                    }
+                } else {
+                    tvCurrentPlace.text = "Ubicación no disponible"
+                }
+            }
+        } else {
+            tvCurrentPlace.text = "Permiso de ubicación no concedido"
+        }
     }
 
     override fun onMapReady(googleMap: GoogleMap) {

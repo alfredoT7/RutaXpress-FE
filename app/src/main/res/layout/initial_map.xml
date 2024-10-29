@@ -22,10 +22,11 @@
             android:text="@string/my_ubication">
         </TextView>
         <TextView
+            android:id="@+id/tvCurrentPlace"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:text="Cala Cala, calle los alamos"
+            tools:text="Cala Cala, calle los alamos"
             android:textStyle="bold"
             android:textSize="17sp"
             >
