@@ -5,6 +5,7 @@ import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.widget.Button
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
@@ -25,6 +26,9 @@ class SearchActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var autocompleteFragment: AutocompleteSupportFragment
     private lateinit var googleMap: GoogleMap
     private lateinit var userLocation: LatLng
+    private lateinit var confirmButton: Button
+    private var selectedLatLng: LatLng? = null
+    private var selectedAddress: String? = null
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -49,13 +53,13 @@ class SearchActivity : AppCompatActivity(), OnMapReadyCallback {
                 val latLng = place.latLng
                 // Mueve el mapa al lugar seleccionado y añade un marcador
                 if (latLng != null) {
-                    //Intent para regresar a InitialMapActivity con sus datos
-                    val returnIntent = Intent()
-                    returnIntent.putExtra("SELECTED_LATITUDE", latLng.latitude)
-                    returnIntent.putExtra("SELECTED_LONGITUDE", latLng.longitude)
-                    returnIntent.putExtra("SELECTED_ADDRESS", place.address)
-                    setResult(Activity.RESULT_OK, returnIntent)
-                    finish()
+                    selectedLatLng = latLng
+                    selectedAddress = place.address
+
+                    googleMap.clear()
+                    googleMap.addMarker(MarkerOptions().position(latLng).title("Ubicación Seleccionada"))
+                    googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 17f))
+                    confirmButton.isEnabled = true
                 }
             }
 
@@ -68,6 +72,18 @@ class SearchActivity : AppCompatActivity(), OnMapReadyCallback {
         val mapFragment = supportFragmentManager.findFragmentById(R.id.mapSearch) as SupportMapFragment
         mapFragment.getMapAsync(this)  // Obtén el mapa de forma asíncrona
 
+        // Configurar el botón de confirmación
+        confirmButton = findViewById(R.id.confirm_button)
+        confirmButton.setOnClickListener {
+            selectedLatLng?.let { location ->
+                val returnIntent = Intent()
+                returnIntent.putExtra("SELECTED_LATITUDE", location.latitude)
+                returnIntent.putExtra("SELECTED_LONGITUDE", location.longitude)
+                returnIntent.putExtra("SELECTED_ADDRESS", selectedAddress)
+                setResult(Activity.RESULT_OK, returnIntent)
+                finish()
+            }
+        }
     }
 
     override fun onMapReady(map: GoogleMap) {
@@ -81,6 +97,17 @@ class SearchActivity : AppCompatActivity(), OnMapReadyCallback {
             enableLocation()
         }catch(Any: Exception){
             Toast.makeText(this@SearchActivity, "Error en mostrar ubicacion actual", Toast.LENGTH_SHORT).show()
+        }
+        // Detecta toques en el mapa para colocar un marcador
+        googleMap.setOnMapClickListener { latLng ->
+            // Borra marcadores anteriores
+            googleMap.clear()
+            // Añade un nuevo marcador en la posición seleccionada
+            googleMap.addMarker(MarkerOptions().position(latLng).title("Ubicación seleccionada"))
+
+            // Guardar la coordenada para retornarla más adelante
+            selectedLatLng = latLng
+            confirmButton.isEnabled = true  // Activar el botón de confirmación
         }
     }
 
