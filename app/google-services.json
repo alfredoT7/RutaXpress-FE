@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "142832195453",
+    "project_id": "rutaxpress-38f3b",
+    "storage_bucket": "rutaxpress-38f3b.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:142832195453:android:04edfa175bd1b8cf1d1e14",
+        "android_client_info": {
+          "package_name": "rutaXpress.login"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "142832195453-s5ff1nd11henalm7vm1acqbd6kmrqpk5.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "rutaXpress.login",
+            "certificate_hash": "12900194ca4baffc1ee8c90ceec2bfe08c3df2a7"
+          }
+        },
+        {
+          "client_id": "142832195453-8641gq34a9gn0lmd133ud7ub69p6deid.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAMpwddXFk-sH08Q5_XiwBL0jk3ek8h4tQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "142832195453-8641gq34a9gn0lmd133ud7ub69p6deid.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

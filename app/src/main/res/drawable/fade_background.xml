@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Fondo blanco -->
+    <item>
+        <color android:color="#FFFFFF" />
+    </item>
+    <!-- Gradiente que se desvanece -->
+    <item>
+        <shape>
+            <gradient
+                android:startColor="#FFFFFF"
+                android:endColor="#00FFFFFF"
+                android:angle="90"/> <!-- El ángulo 90 hace que el gradiente sea vertical -->
+        </shape>
+    </item>
+</layer-list>

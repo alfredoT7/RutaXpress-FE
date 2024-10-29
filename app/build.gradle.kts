@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
+    alias(libs.plugins.googleService)
 }
 
 android {
@@ -49,9 +50,12 @@ dependencies {
     implementation(libs.androidx.activity)
     implementation(libs.androidx.constraintlayout)
     implementation(libs.play.services.location)
-    implementation(libs.firebase.common.ktx)
-    implementation(libs.firebase.auth.ktx)
-
+    implementation(libs.firebaseAuth)
+    implementation(libs.firebaseStore)
+    implementation(libs.firebaseStorage)
+    implementation(libs.retrofit)
+    implementation(libs.corrutines)
+    implementation(libs.gson)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

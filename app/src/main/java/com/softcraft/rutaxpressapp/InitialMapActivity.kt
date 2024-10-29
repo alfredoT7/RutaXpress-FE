@@ -1,10 +1,17 @@
 package com.softcraft.rutaxpressapp
 
 import android.Manifest
+import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.graphics.Matrix
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.cardview.widget.CardView
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.google.android.gms.maps.GoogleMap
@@ -13,12 +20,26 @@ import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.location.LocationServices
+import com.google.android.gms.maps.model.BitmapDescriptor
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
+import com.google.android.gms.maps.model.CustomCap
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.PolylineOptions
+import com.softcraft.rutaxpressapp.routes.ApiService
+import com.softcraft.rutaxpressapp.routes.BackendRouteResponse
+import com.softcraft.rutaxpressapp.routes.RouteResponse
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
+import retrofit2.create
 
 class InitialMapActivity : AppCompatActivity(), OnMapReadyCallback, OnMyLocationButtonClickListener {
 
     // Variables globales
     private lateinit var map: GoogleMap
+    private lateinit var cvBusLines: CardView
 
     companion object{
         const val REQUEST_CODE_LOCATION = 0
@@ -27,14 +48,28 @@ class InitialMapActivity : AppCompatActivity(), OnMapReadyCallback, OnMyLocation
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.initial_map)
-
+        initListeners()
         // Solicitar permisos antes de crear el mapa
         if (isLocationPermissionGranted()) {
             createFragment()
+            val routeId = intent.getStringExtra("routeId")
+            if (routeId != null) {
+                createRoute(routeId)
+            }
         } else {
             requestLocationPermission()  // Esto debería solicitar los permisos
         }
     }
+
+    private fun initListeners() {
+        cvBusLines = findViewById(R.id.cvBusLines)
+        cvBusLines.setOnClickListener {
+            // Aquí deberías abrir la actividad de filtrado de líneas
+            val click = Intent(this, LineasFilterActivity::class.java)
+            startActivity(click)
+        }
+    }
+
 
     private fun createFragment() {
         val mapFragment: SupportMapFragment = supportFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
@@ -113,5 +148,64 @@ class InitialMapActivity : AppCompatActivity(), OnMapReadyCallback, OnMyLocation
     override fun onMyLocationButtonClick(): Boolean {
         Toast.makeText(this, "Botón de ubicación pulsado", Toast.LENGTH_SHORT).show()
         return false
+    }
+
+    private fun createRoute(routeId: String) {
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                val request = getBackendRetrofit().create(ApiService::class.java)
+                    .getBackendRoute(routeId)
+
+                if (request.isSuccessful) {
+                    request.body()?.let { response ->
+                        drawBackendRoute(response)
+                        Log.i("alfredoDev", "Backend route fetched successfully")
+                    }
+                } else {
+                    Log.e("alfredoDev", "Error fetching route: ${request.errorBody()?.string()}")
+                }
+            } catch (e: Exception) {
+                Log.e("alfredoDev", "Exception fetching route", e)
+            }
+        }
+    }
+
+    /**
+     * Hay QUE REFACTORIZAR HIJAS mejor, talque no se haga todo en un archivos, para no afectar la funcionalidad creo como REACT
+     */
+
+    private fun drawBackendRoute(routeResponse: BackendRouteResponse) {
+        val polylineOptions = PolylineOptions()
+
+        routeResponse.geojson.features.firstOrNull()?.geometry?.coordinates?.forEach { coordinate ->
+            // Convert [longitude, latitude] to LatLng
+            polylineOptions.add(LatLng(coordinate[1], coordinate[0]))
+        }
+
+        runOnUiThread {
+            val poly = map.addPolyline(polylineOptions)
+            poly.color = ContextCompat.getColor(this, R.color.routeMap)
+            poly.width = 12f
+            poly.endCap = CustomCap(resizeIcon(R.drawable.bus, this))
+
+            // Move camera to show the entire route
+            val bounds = com.google.android.gms.maps.model.LatLngBounds.Builder()
+            routeResponse.geojson.features.firstOrNull()?.geometry?.coordinates?.forEach { coordinate ->
+                bounds.include(LatLng(coordinate[1], coordinate[0]))
+            }
+            map.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds.build(), 100))
+        }
+    }
+    private fun resizeIcon(resourceId: Int, context: Context): BitmapDescriptor {
+        val imageBitmap = BitmapFactory.decodeResource(context.resources, resourceId)
+        val scaledBitmap = Bitmap.createScaledBitmap(imageBitmap, 50, 50, false)
+        return BitmapDescriptorFactory.fromBitmap(scaledBitmap)
+    }
+
+    private fun getBackendRetrofit(): Retrofit {
+        return Retrofit.Builder()
+            .baseUrl("https://ruta-xpress-backend-express-js.vercel.app/")
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
     }
 }

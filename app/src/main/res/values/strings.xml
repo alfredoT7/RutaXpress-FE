@@ -1,6 +1,13 @@
 <resources>
     <string name="app_name">RutaXpressApp</string>
     <string name="login_tittle">Bienvenido!</string>
+    <string name="register">Regístrate</string>
+    <string name="name">Nombre</string>
+    <string name="last_name">Apellido</string>
+    <string name="phone">Teléfono</string>
+    <string name="direction">Direccion</string>
+    <string name="year">Edad</string>
+    <string name="register_button_text">Registrarse</string>
     <string name="email_field_text">Correo Electrónico</string>
     <string name="password_field_text">Contraseña</string>
     <string name="forgot_password">Olvidaste tu contraseña</string>
@@ -8,4 +15,12 @@
     <string name="not_member_text">No eres parte? Regístrate ahora!</string>
     <string name="or_continue_with">O continua con</string>
     <string name="login_header_image">Login Header Image</string>
+    <string name="search_box_from">¿Desde dónde vas?</string>
+    <string name="search_box_where">Escribe tu ubicacion o selecciona en el mapa</string>
+    <string name="bus_lines">Lineas</string>
+    <string name="favorite_routes">Rutas Favoritas</string>
+    <string name="my_ubication">Mi Ubicación</string>
+    <string name="search_btn_text">Buscar Trufi</string>
+    <string name="search_btn_text_filter_routes">Busca una linea</string>
+    <string name="all_lineas">Todas las lineas</string>
 </resources>
