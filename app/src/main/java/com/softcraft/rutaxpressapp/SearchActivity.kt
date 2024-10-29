@@ -55,6 +55,10 @@ class SearchActivity : AppCompatActivity(), OnMapReadyCallback {
                 if (latLng != null) {
                     selectedLatLng = latLng
                     selectedAddress = place.address
+
+                    googleMap.clear()
+                    googleMap.addMarker(MarkerOptions().position(latLng).title("Ubicación Seleccionada"))
+                    googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 17f))
                     confirmButton.isEnabled = true
                 }
             }
