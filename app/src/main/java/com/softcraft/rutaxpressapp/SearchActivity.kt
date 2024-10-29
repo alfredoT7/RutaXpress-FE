@@ -28,6 +28,7 @@ class SearchActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var userLocation: LatLng
     private lateinit var confirmButton: Button
     private var selectedLatLng: LatLng? = null
+    private var selectedAddress: String? = null
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -52,13 +53,9 @@ class SearchActivity : AppCompatActivity(), OnMapReadyCallback {
                 val latLng = place.latLng
                 // Mueve el mapa al lugar seleccionado y añade un marcador
                 if (latLng != null) {
-                    //Intent para regresar a InitialMapActivity con sus datos
-                    val returnIntent = Intent()
-                    returnIntent.putExtra("SELECTED_LATITUDE", latLng.latitude)
-                    returnIntent.putExtra("SELECTED_LONGITUDE", latLng.longitude)
-                    returnIntent.putExtra("SELECTED_ADDRESS", place.address)
-                    setResult(Activity.RESULT_OK, returnIntent)
-                    finish()
+                    selectedLatLng = latLng
+                    selectedAddress = place.address
+                    confirmButton.isEnabled = true
                 }
             }
 
@@ -78,6 +75,7 @@ class SearchActivity : AppCompatActivity(), OnMapReadyCallback {
                 val returnIntent = Intent()
                 returnIntent.putExtra("SELECTED_LATITUDE", location.latitude)
                 returnIntent.putExtra("SELECTED_LONGITUDE", location.longitude)
+                returnIntent.putExtra("SELECTED_ADDRESS", selectedAddress)
                 setResult(Activity.RESULT_OK, returnIntent)
                 finish()
             }
