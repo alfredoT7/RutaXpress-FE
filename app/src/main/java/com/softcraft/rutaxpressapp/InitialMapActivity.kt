@@ -11,6 +11,7 @@ import android.graphics.Matrix
 import android.os.Bundle
 import android.util.Log
 import android.widget.EditText
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.cardview.widget.CardView
@@ -43,6 +44,8 @@ import retrofit2.create
 class InitialMapActivity : AppCompatActivity(), OnMapReadyCallback, OnMyLocationButtonClickListener {
     private lateinit var map: GoogleMap
     private lateinit var cvBusLines: CardView
+    private lateinit var cvWhereYouGoFrom: CardView
+    private lateinit var cvWhereYouGoTo: CardView
     companion object{
         const val REQUEST_CODE_LOCATION = 0
         private const val REQUEST_CODE_SEARCH_ACTIVITY = 1
@@ -62,32 +65,40 @@ class InitialMapActivity : AppCompatActivity(), OnMapReadyCallback, OnMyLocation
             requestLocationPermission()  // Esto debería solicitar los permisos
         }
 
-        val searchBoxFrom: EditText = findViewById(R.id.search_box_from)
-        searchBoxFrom.setOnClickListener {
-            val intent = Intent(this, SearchActivity::class.java)
-
-            // Intentamos obtener la última ubicación conocida
-            val fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
-            fusedLocationClient.lastLocation.addOnSuccessListener { location ->
-                if (location != null) {
-                    // Si la ubicación es válida, pasamos latitud y longitud en el Intent
-                    intent.putExtra("LATITUDE", location.latitude)
-                    intent.putExtra("LONGITUDE", location.longitude)
-                }
-                // Iniciamos `SearchActivity` ya sea con o sin coordenadas
-                startActivityForResult(intent, REQUEST_CODE_SEARCH_ACTIVITY)
-            }.addOnFailureListener {
-                // solo lanzamos la actividad sin extras
-                startActivityForResult(intent, REQUEST_CODE_SEARCH_ACTIVITY)
-            }
-        }
     }
     private fun initListeners() {
         cvBusLines = findViewById(R.id.cvBusLines)
+        cvWhereYouGoFrom = findViewById(R.id.cvWhereYouGoFrom)
+        cvWhereYouGoTo = findViewById(R.id.cvWhereYouGoTo)
         cvBusLines.setOnClickListener {
             // Aquí deberías abrir la actividad de filtrado de líneas
             val click = Intent(this, LineasFilterActivity::class.java)
             startActivity(click)
+        }
+        cvWhereYouGoFrom.setOnClickListener{
+            navigateToSearchActivity()
+        }
+        cvWhereYouGoTo.setOnClickListener{
+            navigateToSearchActivity()
+        }
+
+
+    }
+    fun navigateToSearchActivity(){
+        val intent = Intent(this, SearchActivity::class.java)
+
+        val fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
+        fusedLocationClient.lastLocation.addOnSuccessListener { location ->
+            if (location != null) {
+                // Si la ubicación es válida, pasamos latitud y longitud en el Intent
+                intent.putExtra("LATITUDE", location.latitude)
+                intent.putExtra("LONGITUDE", location.longitude)
+            }
+            // Iniciamos `SearchActivity` ya sea con o sin coordenadas
+            startActivityForResult(intent, REQUEST_CODE_SEARCH_ACTIVITY)
+        }.addOnFailureListener {
+            // solo lanzamos la actividad sin extras
+            startActivityForResult(intent, REQUEST_CODE_SEARCH_ACTIVITY)
         }
     }
 
@@ -243,6 +254,10 @@ class InitialMapActivity : AppCompatActivity(), OnMapReadyCallback, OnMyLocation
             }
         }
     }
+
+
+
+
     private fun resizeIcon(resourceId: Int, context: Context, width: Int, height: Int): BitmapDescriptor {
         val imageBitmap = BitmapFactory.decodeResource(context.resources, resourceId)
         val scaledBitmap = Bitmap.createScaledBitmap(imageBitmap, width, height, false)
