@@ -28,4 +28,5 @@
     <string name="confirm_location">Confirmar ubicación</string>
     <string name="route_start">Ruta de ida</string>
     <string name="route_end">Ruta de vuelta</string>
+    <string name="options_to_find_the_route">Opciones para encontrar tu ruta:</string>
 </resources>
