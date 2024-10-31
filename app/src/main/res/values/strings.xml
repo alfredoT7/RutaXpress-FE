@@ -10,6 +10,7 @@
     <string name="register_button_text">Registrarse</string>
     <string name="email_field_text">Correo Electrónico</string>
     <string name="password_field_text">Contraseña</string>
+    <string name="password_confirm_field_text">Confirmar Contraseña</string>
     <string name="forgot_password">Olvidaste tu contraseña</string>
     <string name="login_button_text">Login</string>
     <string name="not_member_text">No eres parte? Regístrate ahora!</string>
