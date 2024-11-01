@@ -25,8 +25,9 @@
     <string name="all_lineas">Todas las lineas</string>
     <string name="choose_direction">Elige la dirección de tu transporte</string>
     <string name="choose_one_option">Elige uno de estas opciones para esta ruta</string>
-    <string name="confirm_location">Confirmar ubicación</string>
+    <string name="confirm_direction_trufi">Confirmar dirección del trufi</string>
     <string name="route_start">Ruta de ida</string>
     <string name="route_end">Ruta de vuelta</string>
     <string name="options_to_find_the_route">Opciones para encontrar tu ruta:</string>
+    <string name="line_detail">Detalles de la linea</string>
 </resources>
