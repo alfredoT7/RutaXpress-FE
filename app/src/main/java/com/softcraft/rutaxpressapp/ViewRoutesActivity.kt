@@ -86,7 +86,7 @@ class ViewRoutesActivity : AppCompatActivity(), OnMapReadyCallback {
             } else {
                 endRoutePolyline?.remove()
                 endRoutePolyline = polyline
-                polyline.color = ContextCompat.getColor(this, R.color.btnColor)
+                polyline.color = ContextCompat.getColor(this, R.color.teal_200)
                 polyline.startCap = CustomCap(BitmapDescriptorFactory.fromBitmap(resizeBitmap(R.drawable.ini, 75, 75)))
                 polyline.endCap = CustomCap(BitmapDescriptorFactory.fromBitmap(resizeBitmap(R.drawable.end, 75, 75)))
             }
@@ -113,14 +113,13 @@ class ViewRoutesActivity : AppCompatActivity(), OnMapReadyCallback {
         val mapFragment = supportFragmentManager.findFragmentById(R.id.mapViewRoutes) as SupportMapFragment
         mapFragment.getMapAsync(this)
     }
-
-
     private fun initComponents() {
         cvStartRoute = findViewById(R.id.cvStartRoute)
         cvEndRoute = findViewById(R.id.cvEndRoute)
     }
     private fun initListeners() {
         cvStartRoute.setOnClickListener {
+            changeCardBackgroundColor(cvStartRoute, cvEndRoute)
             endRoutePolyline?.remove()
             if (startRouteResponse != null) {
                 drawBackendRoute(startRouteResponse!!, 1)
@@ -129,6 +128,7 @@ class ViewRoutesActivity : AppCompatActivity(), OnMapReadyCallback {
             }
         }
         cvEndRoute.setOnClickListener {
+            changeCardBackgroundColor(cvStartRoute, cvEndRoute)
             startRoutePolyline?.remove()
             if (endRouteResponse != null) {
                 drawBackendRoute(endRouteResponse!!, 2)
@@ -138,9 +138,25 @@ class ViewRoutesActivity : AppCompatActivity(), OnMapReadyCallback {
         }
     }
 
+    private fun changeCardBackgroundColor(cvStartRoute: CardView, cvEndRoute: CardView) {
+        if (cvStartRoute.isSelected) {
+            cvStartRoute.setCardBackgroundColor(ContextCompat.getColor(this, R.color.cv_bg_color))
+            cvEndRoute.setCardBackgroundColor(ContextCompat.getColor(this, R.color.cv_bg_color_selected))
+            cvStartRoute.isSelected = false
+            cvEndRoute.isSelected = true
+        } else {
+            cvStartRoute.setCardBackgroundColor(ContextCompat.getColor(this, R.color.cv_bg_color_selected))
+            cvEndRoute.setCardBackgroundColor(ContextCompat.getColor(this, R.color.cv_bg_color))
+            cvStartRoute.isSelected = true
+            cvEndRoute.isSelected = false
+        }
+    }
+
     override fun onMapReady(googleMap: GoogleMap) {
         map = googleMap
         val cocha = LatLng(-17.39509587774758, -66.16185635257042)
         map.animateCamera(CameraUpdateFactory.newLatLngZoom(cocha, 8f),300,null)
     }
+
+
 }
