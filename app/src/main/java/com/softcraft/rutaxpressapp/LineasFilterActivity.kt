@@ -8,7 +8,6 @@ import android.util.Log
 import android.view.inputmethod.EditorInfo
 import android.widget.EditText
 import android.widget.Toast
-import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -108,7 +107,10 @@ class LineasFilterActivity : AppCompatActivity() {
         }
     }
     private fun onLineaClick(linea: LineaResponse) {
-        val intent = Intent(this, InitialMapActivity::class.java)
+//        val intent = Intent(this, InitialMapActivity::class.java)
+//        intent.putExtra("routeId", linea.routeId)
+//        startActivity(intent)
+        val intent = Intent(this, ViewRoutesActivity::class.java)
         intent.putExtra("routeId", linea.routeId)
         startActivity(intent)
     }

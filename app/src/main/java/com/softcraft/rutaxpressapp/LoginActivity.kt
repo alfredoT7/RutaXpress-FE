@@ -39,6 +39,8 @@ class LoginActivity : AppCompatActivity() {
 
     private fun initListeners() {
         btnLogin.setOnClickListener {
+            //val intent = Intent(this, InitialMapActivity::class.java)
+            //startActivity(intent)
             val email = etUsername.text.toString()
             val password = etPassword.text.toString()
 
