@@ -39,16 +39,16 @@ class LoginActivity : AppCompatActivity() {
 
     private fun initListeners() {
         btnLogin.setOnClickListener {
-            //val intent = Intent(this, InitialMapActivity::class.java)
-            //startActivity(intent)
-            val email = etUsername.text.toString()
-            val password = etPassword.text.toString()
-
-            if (email.isNotEmpty() && password.isNotEmpty()) {
-                loginUserWithFirebase(email, password)
-            } else {
-                Toast.makeText(this, "Por favor ingrese todos los campos", Toast.LENGTH_SHORT).show()
-            }
+            val intent = Intent(this, InitialMapActivity::class.java)
+            startActivity(intent)
+//            val email = etUsername.text.toString()
+//            val password = etPassword.text.toString()
+//
+//            if (email.isNotEmpty() && password.isNotEmpty()) {
+//                loginUserWithFirebase(email, password)
+//            } else {
+//                Toast.makeText(this, "Por favor ingrese todos los campos", Toast.LENGTH_SHORT).show()
+//            }
         }
 
         // Listener para ir a la pantalla de registro
