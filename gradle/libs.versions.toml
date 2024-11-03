@@ -21,6 +21,8 @@ googleFirebaseCrashlytics = "3.0.2"
 google_places = "3.1.0"
 cloudinaryV = "3.0.2"
 playServicesCastTv = "21.1.1"
+glide = "4.12.0"
+
 
 
 
@@ -48,6 +50,8 @@ firebase-crashlytics = { group = "com.google.firebase", name = "firebase-crashly
 cloudinaryAndroid = { group = "com.cloudinary", name = "cloudinary-android", version.ref = "cloudinaryV" }
 places = { module = "com.google.android.libraries.places:places", version.ref = "google_places" }
 play-services-cast-tv = { group = "com.google.android.gms", name = "play-services-cast-tv", version.ref = "playServicesCastTv" }
+glide = { group = "com.github.bumptech.glide", name = "glide", version.ref = "glide" }
+
 
 
 [plugins]

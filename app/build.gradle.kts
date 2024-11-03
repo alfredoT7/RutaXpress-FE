@@ -56,6 +56,7 @@ dependencies {
     implementation(libs.firebaseAnalitics)
     implementation(libs.firebase.crashlytics)
     implementation(libs.cloudinaryAndroid)
+    implementation(libs.glide)
     implementation(libs.retrofit)
     implementation(libs.corrutines)
     implementation(libs.gson)

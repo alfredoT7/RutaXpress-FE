@@ -10,11 +10,19 @@ import android.widget.EditText
 import android.widget.ImageView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
+import android.graphics.Bitmap
+import com.bumptech.glide.Glide
 import com.cloudinary.android.MediaManager
 import com.cloudinary.android.callback.ErrorInfo
 import com.cloudinary.android.callback.UploadCallback
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.withContext
+import java.io.ByteArrayOutputStream
 import java.util.Calendar
 
 class RegisterActivity : AppCompatActivity() {
@@ -35,11 +43,19 @@ class RegisterActivity : AppCompatActivity() {
         setContentView(R.layout.activity_register)
         auth = FirebaseAuth.getInstance()
 
+        // Inicializa Cloudinary
         initCloudinary()
+
+        // Inicializa los componentes de la UI
         initComponents()
+
+        // Configura los listeners para los botones
         initListeners()
     }
 
+    /**
+     * Inicializa Cloudinary con las configuraciones necesarias.
+     */
     private fun initCloudinary() {
         val config = mapOf(
             "cloud_name" to "djcfm4nd2",
@@ -49,6 +65,9 @@ class RegisterActivity : AppCompatActivity() {
         MediaManager.init(this, config)
     }
 
+    /**
+     * Inicializa los componentes de la interfaz de usuario.
+     */
     private fun initComponents() {
         etUsername = findViewById(R.id.etUsername)
         etLastName = findViewById(R.id.etLastName)
@@ -61,6 +80,9 @@ class RegisterActivity : AppCompatActivity() {
         profileImage = findViewById(R.id.profileImage)
     }
 
+    /**
+     * Configura los listeners de eventos para los elementos de la UI.
+     */
     private fun initListeners() {
         btnRegister.setOnClickListener {
             val email = etEmail.text.toString().trim()
@@ -84,14 +106,24 @@ class RegisterActivity : AppCompatActivity() {
         }
     }
 
+    /**
+     * Maneja la selección de la imagen de perfil del usuario.
+     */
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == 1000 && resultCode == RESULT_OK) {
             selectedImageUri = data?.data
-            profileImage.setImageURI(selectedImageUri)
+            // Muestra la imagen seleccionada usando Glide
+            Glide.with(this)
+                .load(selectedImageUri)
+                .placeholder(R.drawable.ic_default_profile)
+                .into(profileImage)
         }
     }
 
+    /**
+     * Muestra el DatePicker para seleccionar la fecha de nacimiento.
+     */
     private fun showDatePickerDialog() {
         val calendar = Calendar.getInstance()
         val year = calendar.get(Calendar.YEAR)
@@ -104,35 +136,62 @@ class RegisterActivity : AppCompatActivity() {
         datePickerDialog.show()
     }
 
+    /**
+     * Valida los campos de entrada del formulario de registro.
+     */
     private fun validateInputs(email: String, password: String, confirmPassword: String, username: String, lastName: String, birthDate: String, phone: String): Boolean {
-        if (username.isEmpty() || lastName.isEmpty() || email.isEmpty() || password.isEmpty() || confirmPassword.isEmpty() || birthDate.isEmpty() || phone.isEmpty()) {
-            Toast.makeText(this, "Por favor ingrese todos los campos", Toast.LENGTH_SHORT).show()
-            return false
-        }
+        val errorMessages = mutableListOf<String>()
+        if (username.isEmpty()) errorMessages.add("El nombre de usuario está vacío")
+        if (lastName.isEmpty()) errorMessages.add("El apellido está vacío")
+        if (email.isEmpty()) errorMessages.add("El correo electrónico está vacío")
+        if (password.isEmpty() || confirmPassword.isEmpty()) errorMessages.add("La contraseña está vacía")
+        if (password != confirmPassword) errorMessages.add("Las contraseñas no coinciden")
+        if (birthDate.isEmpty()) errorMessages.add("La fecha de nacimiento está vacía")
+        if (phone.isEmpty()) errorMessages.add("El teléfono está vacío")
 
-        if (password != confirmPassword) {
-            Toast.makeText(this, "Las contraseñas no coinciden", Toast.LENGTH_SHORT).show()
-            return false
+        return if (errorMessages.isNotEmpty()) {
+            Toast.makeText(this, errorMessages.joinToString("\n"), Toast.LENGTH_LONG).show()
+            false
+        } else {
+            true
         }
-
-        return true
     }
 
+    /**
+     * Registra un usuario en Firebase Authentication.
+     */
     private fun registerUserWithFirebase(email: String, password: String, username: String, lastName: String, birthDate: String, phone: String) {
-        auth.createUserWithEmailAndPassword(email, password).addOnCompleteListener { task ->
-            if (task.isSuccessful) {
-                val userId = auth.currentUser?.uid ?: return@addOnCompleteListener
+        lifecycleScope.launch {
+            try {
+                withContext(Dispatchers.IO) {
+                    auth.createUserWithEmailAndPassword(email, password).await()
+                }
+                val userId = auth.currentUser?.uid ?: return@launch
                 uploadProfileImage(userId, email, username, lastName, birthDate, phone)
-            } else {
-                Toast.makeText(this, "Error al registrar usuario", Toast.LENGTH_SHORT).show()
+            } catch (e: Exception) {
+                Toast.makeText(this@RegisterActivity, "Error al registrar usuario", Toast.LENGTH_SHORT).show()
             }
         }
     }
 
+    /**
+     * Comprime la imagen seleccionada antes de subirla.
+     */
+    private fun compressImage(uri: Uri): ByteArray {
+        val bitmap = MediaStore.Images.Media.getBitmap(contentResolver, uri)
+        val outputStream = ByteArrayOutputStream()
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 50, outputStream) // Comprime al 50%
+        return outputStream.toByteArray()
+    }
+
+    /**
+     * Sube la imagen de perfil del usuario a Cloudinary.
+     */
     private fun uploadProfileImage(userId: String, email: String, username: String, lastName: String, birthDate: String, phone: String) {
         if (selectedImageUri != null) {
-            MediaManager.get().upload(selectedImageUri)
-                .option("public_id", "rutaXpess/$userId") // Cambia la ruta a "rutaXpess/$userId"
+            val compressedImage = compressImage(selectedImageUri!!)
+            MediaManager.get().upload(compressedImage)
+                .option("public_id", "profileImages/$userId")
                 .callback(object : UploadCallback {
                     override fun onStart(requestId: String) {}
 
@@ -155,7 +214,9 @@ class RegisterActivity : AppCompatActivity() {
         }
     }
 
-
+    /**
+     * Guarda la información del usuario en Firebase Firestore.
+     */
     private fun saveUserToFirestore(userId: String, email: String, username: String, lastName: String, birthDate: String, phone: String, profileImageUrl: String?) {
         val user = hashMapOf(
             "username" to username,
@@ -166,7 +227,13 @@ class RegisterActivity : AppCompatActivity() {
             "profileImageUrl" to profileImageUrl
         )
 
-        FirebaseFirestore.getInstance().collection("users").document(userId).set(user).addOnSuccessListener {
+        val db = FirebaseFirestore.getInstance()
+        val batch = db.batch()
+
+        val userRef = db.collection("users").document(userId)
+        batch.set(userRef, user)
+
+        batch.commit().addOnSuccessListener {
             Toast.makeText(this, "Registro exitoso", Toast.LENGTH_SHORT).show()
             startActivity(Intent(this, LoginActivity::class.java))
             finish()
