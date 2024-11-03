@@ -1,17 +1,19 @@
 package com.softcraft.rutaxpressapp
 
+import android.app.DatePickerDialog
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
-import android.util.Log
+import android.provider.MediaStore
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.cloudinary.android.MediaManager
+import com.cloudinary.android.callback.ErrorInfo
+import com.cloudinary.android.callback.UploadCallback
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.ktx.Firebase
-import com.google.firebase.auth.ktx.auth
-import android.app.DatePickerDialog
 import com.google.firebase.firestore.FirebaseFirestore
 import java.util.Calendar
 
@@ -26,14 +28,25 @@ class RegisterActivity : AppCompatActivity() {
     private lateinit var etConfirmPassword: EditText
     private lateinit var btnRegister: Button
     private lateinit var profileImage: ImageView
+    private var selectedImageUri: Uri? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_register)
-        auth = Firebase.auth
+        auth = FirebaseAuth.getInstance()
 
+        initCloudinary()
         initComponents()
         initListeners()
+    }
+
+    private fun initCloudinary() {
+        val config = mapOf(
+            "cloud_name" to "djcfm4nd2",
+            "api_key" to "897657815927312",
+            "api_secret" to "6Af5mOu8kiKfn9MT-P3Ag6vXF1s"
+        )
+        MediaManager.init(this, config)
     }
 
     private fun initComponents() {
@@ -63,12 +76,19 @@ class RegisterActivity : AppCompatActivity() {
             }
         }
 
-        etBirthDate.setOnClickListener {
-            showDatePickerDialog()
-        }
+        etBirthDate.setOnClickListener { showDatePickerDialog() }
 
         profileImage.setOnClickListener {
-            // Código para elegir una imagen de la galería
+            val intent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
+            startActivityForResult(intent, 1000)
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == 1000 && resultCode == RESULT_OK) {
+            selectedImageUri = data?.data
+            profileImage.setImageURI(selectedImageUri)
         }
     }
 
@@ -81,7 +101,6 @@ class RegisterActivity : AppCompatActivity() {
         val datePickerDialog = DatePickerDialog(this, { _, selectedYear, selectedMonth, selectedDay ->
             etBirthDate.setText("$selectedDay/${selectedMonth + 1}/$selectedYear")
         }, year, month, day)
-
         datePickerDialog.show()
     }
 
@@ -96,59 +115,63 @@ class RegisterActivity : AppCompatActivity() {
             return false
         }
 
-        if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-            Toast.makeText(this, "Correo electrónico no válido", Toast.LENGTH_SHORT).show()
-            return false
-        }
-
-        // Validar que la edad sea al menos 13 años
-        val calendar = Calendar.getInstance()
-        val birthYear = birthDate.split("/")[2].toInt()
-        val currentYear = calendar.get(Calendar.YEAR)
-        if (currentYear - birthYear < 13) {
-            Toast.makeText(this, "Debes tener al menos 13 años", Toast.LENGTH_SHORT).show()
-            return false
-        }
-
         return true
     }
 
     private fun registerUserWithFirebase(email: String, password: String, username: String, lastName: String, birthDate: String, phone: String) {
-        auth.createUserWithEmailAndPassword(email, password)
-            .addOnCompleteListener(this) { task ->
-                if (task.isSuccessful) {
-                    val userId = auth.currentUser?.uid
-                    val user = hashMapOf(
-                        "username" to username,
-                        "lastName" to lastName,
-                        "birthDate" to birthDate,
-                        "email" to email,
-                        "phone" to phone
-                    )
-
-                    // Guardar en Firestore
-                    val db = FirebaseFirestore.getInstance()
-                    userId?.let {
-                        db.collection("users").document(it)
-                            .set(user)
-                            .addOnSuccessListener {
-                                Log.d("RegisterActivity", "Datos adicionales guardados en Firestore")
-                                Toast.makeText(this, "Registro exitoso", Toast.LENGTH_SHORT).show()
-                                val intent = Intent(this, LoginActivity::class.java)
-                                startActivity(intent)
-                                finish()
-                            }
-                            .addOnFailureListener { e ->
-                                // Imprimir el error en la consola con más contexto
-                                Log.e("RegisterActivity", "Error al guardar datos en Firestore: ${e.message}", e)
-                                Toast.makeText(this, "Error al guardar datos: ${e.message}", Toast.LENGTH_SHORT).show()
-                            }
-                    }
-                } else {
-                    Log.e("RegisterActivity", "Error en registro: ${task.exception?.message}", task.exception)
-                    Toast.makeText(this, "Error en el registro: ${task.exception?.message}", Toast.LENGTH_SHORT).show()
-                }
+        auth.createUserWithEmailAndPassword(email, password).addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                val userId = auth.currentUser?.uid ?: return@addOnCompleteListener
+                uploadProfileImage(userId, email, username, lastName, birthDate, phone)
+            } else {
+                Toast.makeText(this, "Error al registrar usuario", Toast.LENGTH_SHORT).show()
             }
+        }
     }
 
+    private fun uploadProfileImage(userId: String, email: String, username: String, lastName: String, birthDate: String, phone: String) {
+        if (selectedImageUri != null) {
+            MediaManager.get().upload(selectedImageUri)
+                .option("public_id", "rutaXpess/$userId") // Cambia la ruta a "rutaXpess/$userId"
+                .callback(object : UploadCallback {
+                    override fun onStart(requestId: String) {}
+
+                    override fun onProgress(requestId: String, bytes: Long, totalBytes: Long) {}
+
+                    override fun onSuccess(requestId: String, resultData: Map<*, *>) {
+                        val profileImageUrl = resultData["secure_url"] as String
+                        saveUserToFirestore(userId, email, username, lastName, birthDate, phone, profileImageUrl)
+                    }
+
+                    override fun onError(requestId: String, error: ErrorInfo) {
+                        Toast.makeText(this@RegisterActivity, "Error al subir la imagen: ${error.description}", Toast.LENGTH_SHORT).show()
+                    }
+
+                    override fun onReschedule(requestId: String, error: ErrorInfo) {}
+                })
+                .dispatch()
+        } else {
+            saveUserToFirestore(userId, email, username, lastName, birthDate, phone, null)
+        }
+    }
+
+
+    private fun saveUserToFirestore(userId: String, email: String, username: String, lastName: String, birthDate: String, phone: String, profileImageUrl: String?) {
+        val user = hashMapOf(
+            "username" to username,
+            "lastName" to lastName,
+            "birthDate" to birthDate,
+            "email" to email,
+            "phone" to phone,
+            "profileImageUrl" to profileImageUrl
+        )
+
+        FirebaseFirestore.getInstance().collection("users").document(userId).set(user).addOnSuccessListener {
+            Toast.makeText(this, "Registro exitoso", Toast.LENGTH_SHORT).show()
+            startActivity(Intent(this, LoginActivity::class.java))
+            finish()
+        }.addOnFailureListener { e ->
+            Toast.makeText(this, "Error al guardar datos: ${e.message}", Toast.LENGTH_SHORT).show()
+        }
+    }
 }
