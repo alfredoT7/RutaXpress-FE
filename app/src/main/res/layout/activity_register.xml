@@ -113,19 +113,19 @@
         app:cardCornerRadius="18dp"
         android:layout_marginTop="20dp"
         app:cardBackgroundColor="@color/cv_bg_color"
-        app:cardElevation="0dp"
-        >
+        app:cardElevation="0dp">
+
         <EditText
-            android:id="@+id/etYear"
+            android:id="@+id/etBirthDate"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="@string/year"
-            android:inputType="number"
+            android:hint="Fecha de Nacimiento"
+            android:inputType="date"
+            android:focusable="false"
             android:padding="10dp"
             android:background="@android:color/transparent"
             android:maxLines="1"
-            android:singleLine="true"
-            />
+            android:singleLine="true" />
     </androidx.cardview.widget.CardView>
     <androidx.cardview.widget.CardView
         android:layout_height="wrap_content"
@@ -175,25 +175,52 @@
         app:cardBackgroundColor="@color/cv_bg_color"
         app:cardElevation="0dp"
         >
-        <EditText
-            android:id="@+id/etPassword"
+        <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="@string/password_field_text"
-            android:inputType="textEmailAddress"
-            android:padding="10dp"
-            android:background="@android:color/transparent"
-            android:maxLines="1"
-            android:singleLine="true"/>
+            app:passwordToggleEnabled="true"
+            >
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etPassword"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Contraseña"
+                android:inputType="textPassword"
+                android:background="@color/cv_bg_color"
+                />
+        </com.google.android.material.textfield.TextInputLayout>
+    </androidx.cardview.widget.CardView>
+
+
+    <androidx.cardview.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:cardCornerRadius="18dp"
+        android:layout_marginTop="20dp"
+        app:cardBackgroundColor="@color/cv_bg_color"
+        app:cardElevation="0dp">
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:passwordToggleEnabled="true">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etConfirmPassword"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Confirmar Contraseña"
+                android:inputType="textPassword"
+                android:background="@color/cv_bg_color" />
+        </com.google.android.material.textfield.TextInputLayout>
     </androidx.cardview.widget.CardView>
 
     <Button
-        android:id="@+id/btnLogin"
+        android:id="@+id/btnRegister"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/register_button_text"
         android:textColor="@android:color/white"
         android:backgroundTint="@color/btnColor"
         android:layout_marginTop="20dp" />
-
 </LinearLayout>
