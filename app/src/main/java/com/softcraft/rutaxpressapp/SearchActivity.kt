@@ -30,7 +30,6 @@ class SearchActivity : AppCompatActivity(), OnMapReadyCallback {
     private var selectedLatLng: LatLng? = null
     private var selectedAddress: String? = null
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.search_screen)
@@ -44,8 +43,8 @@ class SearchActivity : AppCompatActivity(), OnMapReadyCallback {
             listOf(Place.Field.ID, Place.Field.ADDRESS, Place.Field.LAT_LNG)
         )
 
-        val latitude = intent.getDoubleExtra("LATITUDE", -34.0) // Valor por defecto
-        val longitude = intent.getDoubleExtra("LONGITUDE", 151.0) // Valor por defecto
+        val latitude = intent.getDoubleExtra("LATITUDE", -34.0)
+        val longitude = intent.getDoubleExtra("LONGITUDE", 151.0)
         userLocation = LatLng(latitude,longitude)
 
         autocompleteFragment.setOnPlaceSelectedListener(object : PlaceSelectionListener {
@@ -68,9 +67,8 @@ class SearchActivity : AppCompatActivity(), OnMapReadyCallback {
             }
         })
 
-        // Configurar el fragmento de mapa
         val mapFragment = supportFragmentManager.findFragmentById(R.id.mapSearch) as SupportMapFragment
-        mapFragment.getMapAsync(this)  // Obtén el mapa de forma asíncrona
+        mapFragment.getMapAsync(this)
 
         // Configurar el botón de confirmación
         confirmButton = findViewById(R.id.confirm_button)
@@ -88,26 +86,22 @@ class SearchActivity : AppCompatActivity(), OnMapReadyCallback {
 
     override fun onMapReady(map: GoogleMap) {
         googleMap = map
-        googleMap.uiSettings.isZoomControlsEnabled = true  // Controles de zoom
+        googleMap.uiSettings.isZoomControlsEnabled = true
         // Centra el mapa en la ubicación del usuario recibida
         map.moveCamera(CameraUpdateFactory.newLatLngZoom(userLocation, 15f))
 
-        // Habilita la capa de ubicación si los permisos ya están concedidos
         try{
             enableLocation()
         }catch(Any: Exception){
             Toast.makeText(this@SearchActivity, "Error en mostrar ubicacion actual", Toast.LENGTH_SHORT).show()
         }
-        // Detecta toques en el mapa para colocar un marcador
-        googleMap.setOnMapClickListener { latLng ->
-            // Borra marcadores anteriores
-            googleMap.clear()
-            // Añade un nuevo marcador en la posición seleccionada
-            googleMap.addMarker(MarkerOptions().position(latLng).title("Ubicación seleccionada"))
 
-            // Guardar la coordenada para retornarla más adelante
+        // Detectamos toques en el mapa para colocar un marker
+        googleMap.setOnMapClickListener { latLng ->
+            googleMap.clear()
+            googleMap.addMarker(MarkerOptions().position(latLng).title("Ubicación seleccionada"))
             selectedLatLng = latLng
-            confirmButton.isEnabled = true  // Activar el botón de confirmación
+            confirmButton.isEnabled = true
         }
     }
 
