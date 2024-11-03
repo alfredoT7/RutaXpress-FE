@@ -219,6 +219,7 @@ class InitialMapActivity : AppCompatActivity(), OnMapReadyCallback, OnMyLocation
             if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 // El permiso fue concedido, habilitar la localización
                 createFragment()
+                headerPlace()
             } else {
                 // El permiso fue denegado
                 Toast.makeText(this, "Acepta los permisos de localización", Toast.LENGTH_SHORT).show()
