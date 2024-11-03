@@ -183,7 +183,7 @@ class InitialMapActivity : AppCompatActivity(), OnMapReadyCallback, OnMyLocation
             val selectedAddress = data?.getStringExtra("SELECTED_ADDRESS")
 
             if (selectedLatitude != null && selectedLongitude != null) {
-                // Mueve tu mapa a la ubicación seleccionada
+                // Mover el mapa a ubicacion seleccionada
                 val selectedLocation = LatLng(selectedLatitude, selectedLongitude)
                 map.clear() // Limpiar marcadores existentes
                 map.addMarker(MarkerOptions().position(selectedLocation).title(selectedAddress))
