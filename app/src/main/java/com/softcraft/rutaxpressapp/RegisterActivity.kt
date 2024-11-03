@@ -1,5 +1,6 @@
 package com.softcraft.rutaxpressapp
 
+import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -25,6 +26,7 @@ class RegisterActivity : AppCompatActivity() {
     private lateinit var etConfirmPassword: EditText
     private lateinit var btnRegister: Button
     private lateinit var profileImage: ImageView
+    private val PICK_IMAGE_REQUEST = 1
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -66,7 +68,9 @@ class RegisterActivity : AppCompatActivity() {
         }
 
         profileImage.setOnClickListener {
-            // Código para elegir una imagen de la galería
+            val intent = Intent(Intent.ACTION_PICK)
+            intent.type = "image/*"
+            startActivityForResult(intent, PICK_IMAGE_REQUEST)
         }
     }
 
@@ -126,4 +130,18 @@ class RegisterActivity : AppCompatActivity() {
                 }
             }
     }
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == PICK_IMAGE_REQUEST && resultCode == Activity.RESULT_OK && data != null) {
+            val imageUri = data.data  //  URI de la imagen seleccionada
+            try {
+                // Muestra la imagen seleccionada en el ImageView
+                profileImage.setImageURI(imageUri)
+            } catch (e: Exception) {
+                e.printStackTrace()
+                Toast.makeText(this, "Error al cargar la imagen", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
 }
