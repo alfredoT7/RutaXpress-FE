@@ -13,6 +13,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.auth.ktx.auth
 import android.app.DatePickerDialog
+import com.google.firebase.firestore.FirebaseFirestore
 import java.util.Calendar
 
 class RegisterActivity : AppCompatActivity() {
@@ -57,9 +58,10 @@ class RegisterActivity : AppCompatActivity() {
             val username = etUsername.text.toString().trim()
             val lastName = etLastName.text.toString().trim()
             val birthDate = etBirthDate.text.toString().trim()
+            val phone = etPhone.text.toString().trim()
 
-            if (validateInputs(email, password, confirmPassword, username, lastName, birthDate)) {
-                registerUserWithFirebase(email, password)
+            if (validateInputs(email, password, confirmPassword, username, lastName, birthDate, phone)) {
+                registerUserWithFirebase(email, password, username, lastName, birthDate, phone)
             }
         }
 
@@ -87,8 +89,8 @@ class RegisterActivity : AppCompatActivity() {
         datePickerDialog.show()
     }
 
-    private fun validateInputs(email: String, password: String, confirmPassword: String, username: String, lastName: String, birthDate: String): Boolean {
-        if (username.isEmpty() || lastName.isEmpty() || email.isEmpty() || password.isEmpty() || confirmPassword.isEmpty() || birthDate.isEmpty()) {
+    private fun validateInputs(email: String, password: String, confirmPassword: String, username: String, lastName: String, birthDate: String, phone: String): Boolean {
+        if (username.isEmpty() || lastName.isEmpty() || email.isEmpty() || password.isEmpty() || confirmPassword.isEmpty() || birthDate.isEmpty() || phone.isEmpty()) {
             Toast.makeText(this, "Por favor ingrese todos los campos", Toast.LENGTH_SHORT).show()
             return false
         }
@@ -115,17 +117,39 @@ class RegisterActivity : AppCompatActivity() {
         return true
     }
 
-    private fun registerUserWithFirebase(email: String, password: String) {
+    private fun registerUserWithFirebase(email: String, password: String, username: String, lastName: String, birthDate: String, phone: String) {
         auth.createUserWithEmailAndPassword(email, password)
             .addOnCompleteListener(this) { task ->
                 if (task.isSuccessful) {
-                    Log.d("RegisterActivity", "Registro exitoso: ${auth.currentUser?.email}")
-                    Toast.makeText(this, "Registro exitoso", Toast.LENGTH_SHORT).show()
-                    val intent = Intent(this, LoginActivity::class.java)
-                    startActivity(intent)
-                    finish()
+                    val userId = auth.currentUser?.uid
+                    val user = hashMapOf(
+                        "username" to username,
+                        "lastName" to lastName,
+                        "birthDate" to birthDate,
+                        "email" to email,
+                        "phone" to phone
+                    )
+
+                    // Guardar en Firestore
+                    val db = FirebaseFirestore.getInstance()
+                    userId?.let {
+                        db.collection("users").document(it)
+                            .set(user)
+                            .addOnSuccessListener {
+                                Log.d("RegisterActivity", "Datos adicionales guardados en Firestore")
+                                Toast.makeText(this, "Registro exitoso", Toast.LENGTH_SHORT).show()
+                                val intent = Intent(this, LoginActivity::class.java)
+                                startActivity(intent)
+                                finish()
+                            }
+                            .addOnFailureListener { e ->
+                                // Imprimir el error en la consola con más contexto
+                                Log.e("RegisterActivity", "Error al guardar datos en Firestore: ${e.message}", e)
+                                Toast.makeText(this, "Error al guardar datos: ${e.message}", Toast.LENGTH_SHORT).show()
+                            }
+                    }
                 } else {
-                    Log.e("RegisterActivity", "Error en registro: ${task.exception?.message}")
+                    Log.e("RegisterActivity", "Error en registro: ${task.exception?.message}", task.exception)
                     Toast.makeText(this, "Error en el registro: ${task.exception?.message}", Toast.LENGTH_SHORT).show()
                 }
             }
