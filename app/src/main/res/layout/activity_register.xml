@@ -41,18 +41,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:scaleType="centerCrop"
+
                 android:src="@drawable/ic_default_profile" />
 
-            <ImageView
-                android:id="@+id/cameraIcon"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:layout_gravity="center"
-                android:layout_marginTop="40dp"
-                android:src="@drawable/ic_camera"
-                app:tint="@color/btnColor"
-
-                />
         </androidx.cardview.widget.CardView>
     </LinearLayout>
 
@@ -119,7 +110,7 @@
             android:id="@+id/etBirthDate"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Fecha de Nacimiento"
+            android:hint="Fecha de Naciientom"
             android:inputType="date"
             android:focusable="false"
             android:padding="10dp"
