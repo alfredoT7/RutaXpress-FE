@@ -7,12 +7,9 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.graphics.Matrix
 import android.location.Address
 import android.location.Geocoder
 import android.os.Bundle
-import android.util.Log
-import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -33,16 +30,7 @@ import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.gms.maps.model.LatLngBounds
 import com.google.android.gms.maps.model.PolylineOptions
 import com.softcraft.rutaxpressapp.lineas.LineasRepository
-import com.softcraft.rutaxpressapp.routes.ApiService
 import com.softcraft.rutaxpressapp.routes.BackendRouteResponse
-import com.softcraft.rutaxpressapp.routes.CalculadoraDist
-import com.softcraft.rutaxpressapp.routes.RouteResponse
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
-import retrofit2.create
 import java.io.IOException
 import java.util.Locale
 class InitialMapActivity : AppCompatActivity(), OnMapReadyCallback, OnMyLocationButtonClickListener {
@@ -82,15 +70,11 @@ class InitialMapActivity : AppCompatActivity(), OnMapReadyCallback, OnMyLocation
             val click = Intent(this, LineasFilterActivity::class.java)
             startActivity(click)
         }
-        cvWhereYouGoFrom.setOnClickListener{
-            navigateToSearchActivity()
-        }
-        cvWhereYouGoTo.setOnClickListener{
-            navigateToSearchActivity()
-        }
+        cvWhereYouGoFrom.setOnClickListener{ navigateToSearchActivity() }
+        cvWhereYouGoTo.setOnClickListener{ navigateToSearchActivity() }
         headerPlace()
-
     }
+
     fun navigateToSearchActivity(){
         val intent = Intent(this, SearchActivity::class.java)
 
@@ -101,10 +85,9 @@ class InitialMapActivity : AppCompatActivity(), OnMapReadyCallback, OnMyLocation
                 intent.putExtra("LATITUDE", location.latitude)
                 intent.putExtra("LONGITUDE", location.longitude)
             }
-            // Iniciamos `SearchActivity` ya sea con o sin coordenadas
             startActivityForResult(intent, REQUEST_CODE_SEARCH_ACTIVITY)
         }.addOnFailureListener {
-            // solo lanzamos la actividad sin extras
+            // solo lanzamos SearchActivity sin puts
             startActivityForResult(intent, REQUEST_CODE_SEARCH_ACTIVITY)
         }
     }
@@ -181,9 +164,9 @@ class InitialMapActivity : AppCompatActivity(), OnMapReadyCallback, OnMyLocation
             val selectedAddress = data?.getStringExtra("SELECTED_ADDRESS")
 
             if (selectedLatitude != null && selectedLongitude != null) {
-                // Mueve tu mapa a la ubicación seleccionada
+                // Mover el mapa a ubicacion seleccionada
                 val selectedLocation = LatLng(selectedLatitude, selectedLongitude)
-                map.clear() // Limpiar marcadores existentes
+                map.clear()
                 map.addMarker(MarkerOptions().position(selectedLocation).title(selectedAddress))
                 map.moveCamera(CameraUpdateFactory.newLatLngZoom(selectedLocation, 15f))
             }
@@ -210,6 +193,7 @@ class InitialMapActivity : AppCompatActivity(), OnMapReadyCallback, OnMyLocation
             REQUEST_CODE_LOCATION
         )
     }
+
     override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<out String>,
@@ -219,9 +203,9 @@ class InitialMapActivity : AppCompatActivity(), OnMapReadyCallback, OnMyLocation
             if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 // El permiso fue concedido, habilitar la localización
                 createFragment()
+                headerPlace()
             } else {
-                // El permiso fue denegado
-                Toast.makeText(this, "Acepta los permisos de localización", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Acepte los permisos de localización", Toast.LENGTH_SHORT).show()
             }
         }
     }
