@@ -7,33 +7,52 @@
     tools:context=".InitialMapActivity"
     android:orientation="vertical">
 
-    <LinearLayout
-        android:layout_width="wrap_content"
+    <RelativeLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:layout_gravity="center"
-        android:background="@drawable/fade_background"
-        android:padding="8dp"
-        >
+        android:padding="16dp">
+
         <TextView
+            android:id="@+id/tvUserName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:text="@string/my_ubication">
-        </TextView>
-        <TextView
-            android:id="@+id/tvCurrentPlace"
+            android:text="@string/my_ubication"
+            android:layout_gravity="center" />
+
+        <ImageView
+            android:id="@+id/imgProfile"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:background="@drawable/ic_circle"
+            android:scaleType="centerCrop"/>
+
+
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            tools:text="Cala Cala, calle los alamos"
-            android:textStyle="bold"
-            android:textSize="17sp"
-            >
+            android:orientation="vertical"
+            android:layout_toEndOf="@id/imgProfile"
+            android:layout_centerVertical="true"
+            android:layout_marginStart="50dp">
 
-        </TextView>
-    </LinearLayout>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/my_ubication"
+                android:layout_gravity="center" />
 
+            <TextView
+                android:id="@+id/tvCurrentPlace"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="17sp"
+                android:textStyle="bold"
+                tools:text="Cala Cala, calle los alamos"
+                android:layout_gravity="center" />
+        </LinearLayout>
+    </RelativeLayout>
     <fragment
         android:id="@+id/map"
         android:name="com.google.android.gms.maps.SupportMapFragment"
