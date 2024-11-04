@@ -1,5 +1,6 @@
 package com.softcraft.rutaxpressapp
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -10,10 +11,21 @@ import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.textfield.TextInputEditText
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
+import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.ktx.Firebase
+
+data class UserProfile(
+    val username: String = "",
+    val lastName: String = "",
+    val email: String = "",
+    val phone: String = "",
+    val birthDate: String = "",
+    val profileImageUrl: String? = null
+)
 
 class LoginActivity : AppCompatActivity() {
     private lateinit var auth: FirebaseAuth
+    private lateinit var db: FirebaseFirestore
 
     private lateinit var etUsername: TextInputEditText
     private lateinit var etPassword: TextInputEditText
@@ -21,8 +33,10 @@ class LoginActivity : AppCompatActivity() {
     private lateinit var tvRegister: TextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        auth = Firebase.auth
         super.onCreate(savedInstanceState)
+        auth = Firebase.auth
+        db = FirebaseFirestore.getInstance()  // Inicializar Firestore
+
         setContentView(R.layout.activity_login)
         initComponents()
         initListeners()
@@ -37,19 +51,16 @@ class LoginActivity : AppCompatActivity() {
 
     private fun initListeners() {
         btnLogin.setOnClickListener {
-            val intent = Intent(this, InitialMapActivity::class.java)
-            startActivity(intent)
-//            val email = etUsername.text.toString()
-//            val password = etPassword.text.toString()
-//
-//            if (email.isNotEmpty() && password.isNotEmpty()) {
-//                loginUserWithFirebase(email, password)
-//            } else {
-//                Toast.makeText(this, "Por favor ingrese todos los campos", Toast.LENGTH_SHORT).show()
-//            }
+            val email = etUsername.text.toString()
+            val password = etPassword.text.toString()
+
+            if (email.isNotEmpty() && password.isNotEmpty()) {
+                loginUserWithFirebase(email, password)
+            } else {
+                Toast.makeText(this, "Por favor ingrese todos los campos", Toast.LENGTH_SHORT).show()
+            }
         }
 
-        // Listener para ir a la pantalla de registro
         tvRegister.setOnClickListener {
             val intent = Intent(this, RegisterActivity::class.java)
             startActivity(intent)
@@ -61,13 +72,63 @@ class LoginActivity : AppCompatActivity() {
             .addOnCompleteListener(this) { task ->
                 if (task.isSuccessful) {
                     Log.d("LoginActivity", "Login con éxito: ${auth.currentUser?.email}")
-                    val intent = Intent(this, InitialMapActivity::class.java)
-                    startActivity(intent)
-                    finish() // Para evitar regresar a la pantalla de login al presionar atrás
+                    loadUserDataAndNavigate()
                 } else {
                     Log.e("LoginActivity", "Error en login: ${task.exception?.message}")
                     Toast.makeText(this, "Error de autenticación: ${task.exception?.message}", Toast.LENGTH_SHORT).show()
                 }
             }
+    }
+
+    private fun loadUserDataAndNavigate() {
+        val userId = auth.currentUser?.uid ?: return
+
+        saveUserId(userId)
+
+        db.collection("users").document(userId)
+            .get()
+            .addOnSuccessListener { document ->
+                if (document != null) {
+                    val userProfile = UserProfile(
+                        username = document.getString("username") ?: "",
+                        lastName = document.getString("lastName") ?: "",
+                        email = document.getString("email") ?: "",
+                        phone = document.getString("phone") ?: "",
+                        birthDate = document.getString("birthDate") ?: "",
+                        profileImageUrl = document.getString("profileImageUrl")
+                    )
+
+                    saveUserProfile(userProfile)
+
+                    // Navegar a InitialMapActivity solo después de cargar los datos
+                    val intent = Intent(this, InitialMapActivity::class.java)
+                    startActivity(intent)
+                    finish()
+                }
+            }
+            .addOnFailureListener { exception ->
+                Toast.makeText(this, "Error al cargar datos: ${exception.message}", Toast.LENGTH_SHORT).show()
+            }
+    }
+
+    private fun saveUserId(userId: String) {
+        val sharedPref = getSharedPreferences("UserPrefs", Context.MODE_PRIVATE)
+        with(sharedPref.edit()) {
+            putString("userId", userId)
+            apply()
+        }
+    }
+
+    private fun saveUserProfile(userProfile: UserProfile) {
+        val sharedPref = getSharedPreferences("UserPrefs", Context.MODE_PRIVATE)
+        with(sharedPref.edit()) {
+            putString("username", userProfile.username)
+            putString("lastName", userProfile.lastName)
+            putString("email", userProfile.email)
+            putString("phone", userProfile.phone)
+            putString("birthDate", userProfile.birthDate)
+            putString("profileImageUrl", userProfile.profileImageUrl)
+            apply()
+        }
     }
 }

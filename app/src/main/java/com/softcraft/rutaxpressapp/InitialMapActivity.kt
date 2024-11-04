@@ -10,12 +10,14 @@ import android.graphics.BitmapFactory
 import android.location.Address
 import android.location.Geocoder
 import android.os.Bundle
+import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.cardview.widget.CardView
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import com.bumptech.glide.Glide
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.GoogleMap.OnMyLocationButtonClickListener
 import com.google.android.gms.maps.OnMapReadyCallback
@@ -39,13 +41,19 @@ class InitialMapActivity : AppCompatActivity(), OnMapReadyCallback, OnMyLocation
     private lateinit var cvWhereYouGoFrom: CardView
     private lateinit var cvWhereYouGoTo: CardView
     private lateinit var tvCurrentPlace: TextView
+    private lateinit var tvUserName: TextView
+    private lateinit var imgProfile: ImageView
+
     companion object{
         const val REQUEST_CODE_LOCATION = 0
         private const val REQUEST_CODE_SEARCH_ACTIVITY = 1
     }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.initial_map)
+        initComponents()
+        loadUserProfile()
         initListeners()
         if (isLocationPermissionGranted()) {
             createFragment()
@@ -53,11 +61,40 @@ class InitialMapActivity : AppCompatActivity(), OnMapReadyCallback, OnMyLocation
             requestLocationPermission()
         }
     }
+    private fun initComponents() {
+        cvBusLines = findViewById(R.id.cvBusLines)
+        cvWhereYouGoFrom = findViewById(R.id.cvWhereYouGoFrom)
+        cvWhereYouGoTo = findViewById(R.id.cvWhereYouGoTo)
+        tvCurrentPlace = findViewById(R.id.tvCurrentPlace)
+        tvUserName = findViewById(R.id.tvUserName)
+        imgProfile = findViewById(R.id.imgProfile)
+    }
 
     private fun drawSavedRoutes() {
         LineasRepository.selectedRoutes.forEach { routeResponse ->
             drawBackendRoute(routeResponse)
         }
+    }
+
+    private fun loadUserProfile() {
+        val sharedPref = getSharedPreferences("UserPrefs", Context.MODE_PRIVATE)
+        val userName = sharedPref.getString("username", "Usuario")
+        val profileImageUrl = sharedPref.getString("profileImageUrl", null)
+
+        // Mostrar nombre del usuario
+        tvUserName.text = userName
+
+        // Mostrar imagen del perfil usando Glide
+        if (profileImageUrl != null && profileImageUrl.isNotEmpty()) {
+            Glide.with(this)
+                .load(profileImageUrl)
+                .circleCrop()
+                .placeholder(R.drawable.ic_default_profile)
+                .into(imgProfile)
+        } else {
+            imgProfile.setImageResource(R.drawable.ic_default_profile)
+        }
+
     }
 
     private fun initListeners() {
