@@ -111,7 +111,7 @@
             android:id="@+id/etBirthDate"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Fecha de Naciientom"
+            android:hint="Fecha de Nacimiento"
             android:inputType="date"
             android:focusable="false"
             android:padding="10dp"

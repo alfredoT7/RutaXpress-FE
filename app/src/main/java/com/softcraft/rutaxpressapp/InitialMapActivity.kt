@@ -257,7 +257,7 @@ class InitialMapActivity : AppCompatActivity(), OnMapReadyCallback, OnMyLocation
     }
 
     override fun onMyLocationButtonClick(): Boolean {
-        Toast.makeText(this, "Botón de ubicación pulsado", Toast.LENGTH_SHORT).show()
+        Toast.makeText(this, "Ésta es tu ubicación actual", Toast.LENGTH_SHORT).show()
         return false
     }
     private fun drawBackendRoute(routeResponse: BackendRouteResponse) {
