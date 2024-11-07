@@ -33,6 +33,7 @@ import com.google.android.gms.maps.model.LatLngBounds
 import com.google.android.gms.maps.model.PolylineOptions
 import com.softcraft.rutaxpressapp.lineas.LineasRepository
 import com.softcraft.rutaxpressapp.routes.BackendRouteResponse
+import com.softcraft.rutaxpressapp.user.UserRepository
 import java.io.IOException
 import java.util.Locale
 class InitialMapActivity : AppCompatActivity(), OnMapReadyCallback, OnMyLocationButtonClickListener {
@@ -53,7 +54,7 @@ class InitialMapActivity : AppCompatActivity(), OnMapReadyCallback, OnMyLocation
         super.onCreate(savedInstanceState)
         setContentView(R.layout.initial_map)
         initComponents()
-        loadUserProfile()
+            loadUserProfile()
         initListeners()
         if (isLocationPermissionGranted()) {
             createFragment()
@@ -83,7 +84,6 @@ class InitialMapActivity : AppCompatActivity(), OnMapReadyCallback, OnMyLocation
 
         // Mostrar nombre del usuario
         tvUserName.text = userName
-
         // Mostrar imagen del perfil usando Glide
         if (profileImageUrl != null && profileImageUrl.isNotEmpty()) {
             Glide.with(this)

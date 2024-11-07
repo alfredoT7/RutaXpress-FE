@@ -6,6 +6,8 @@ import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.util.Log
 import android.widget.Button
+import android.widget.Switch
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.cardview.widget.CardView
 import androidx.core.content.ContextCompat
@@ -35,6 +37,7 @@ class ViewRoutesActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var cvStartRoute: CardView
     private lateinit var cvEndRoute: CardView
     private lateinit var btnConfirmDirection: Button
+    private lateinit var swFavoriteRoute:Switch
     private var startRoutePolyline: Polyline? = null
     private var endRoutePolyline: Polyline? = null
     private var startRouteResponse: BackendRouteResponse? = null
@@ -123,9 +126,10 @@ class ViewRoutesActivity : AppCompatActivity(), OnMapReadyCallback {
         cvStartRoute = findViewById(R.id.cvStartRoute)
         cvEndRoute = findViewById(R.id.cvEndRoute)
         btnConfirmDirection = findViewById(R.id.btnConfirmDirection)
+        swFavoriteRoute = findViewById(R.id.swFavoriteRoute)
     }
 
-    private fun initListeners() {
+    private fun initListeners(){
         cvStartRoute.setOnClickListener {
             endRoutePolyline?.remove()
             if (startRouteResponse != null) {
@@ -146,10 +150,30 @@ class ViewRoutesActivity : AppCompatActivity(), OnMapReadyCallback {
             val intent = Intent(this, InitialMapActivity::class.java)
             startActivity(intent)
         }
+        swFavoriteRoute.setOnCheckedChangeListener { _, isSelected ->
+            if (isSelected) {
+                anadirRutaFavorita()
+            } else {
+                eliminarRutaFavorita()
+            }
+        }
     }
+
+    private fun eliminarRutaFavorita() {
+
+    }
+
+    private fun anadirRutaFavorita() {
+
+    }
+
+
     override fun onMapReady(googleMap: GoogleMap) {
         map = googleMap
         val cocha = LatLng(-17.39509587774758, -66.16185635257042)
         map.animateCamera(CameraUpdateFactory.newLatLngZoom(cocha, 8f), 300, null)
     }
+
+
+
 }
