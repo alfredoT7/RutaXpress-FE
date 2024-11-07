@@ -4,6 +4,7 @@ import com.softcraft.rutaxpressapp.lineas.LineaResponse
 import retrofit2.http.GET
 import retrofit2.http.Query
 import retrofit2.Response
+import retrofit2.http.POST
 import retrofit2.http.Path
 
 interface ApiService {
@@ -20,4 +21,5 @@ interface ApiService {
     ): Response<BackendRouteResponse>
     @GET("/descriptions/")
     suspend fun getLineas(): Response<List<LineaResponse>>
+
 }
