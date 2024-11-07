@@ -25,6 +25,7 @@ import com.google.android.gms.maps.model.PolylineOptions
 import com.softcraft.rutaxpressapp.lineas.LineasRepository
 import com.softcraft.rutaxpressapp.routes.ApiService
 import com.softcraft.rutaxpressapp.routes.BackendRouteResponse
+import com.softcraft.rutaxpressapp.routes.RouteController
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -42,6 +43,7 @@ class ViewRoutesActivity : AppCompatActivity(), OnMapReadyCallback {
     private var endRoutePolyline: Polyline? = null
     private var startRouteResponse: BackendRouteResponse? = null
     private var endRouteResponse: BackendRouteResponse? = null
+    private val routeController:RouteController = RouteController()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -50,31 +52,6 @@ class ViewRoutesActivity : AppCompatActivity(), OnMapReadyCallback {
         createFragment()
         initComponents()
         initListeners()
-    }
-
-    private fun createRoute(routeId: String?, num: Int) {
-        if (routeId != null) {
-            CoroutineScope(Dispatchers.IO).launch {
-                try {
-                    val request = getBackendRetrofit().create(ApiService::class.java).getBackendRoute(routeId)
-                    if (request.isSuccessful) {
-                        request.body()?.let { response ->
-                            if (num == 1) {
-                                startRouteResponse = response
-                            } else {
-                                endRouteResponse = response
-                            }
-                            drawBackendRoute(response, num)
-                            Log.i("alfredoDev", "Ruta obtenida del backend exitosamente")
-                        }
-                    } else {
-                        Log.e("alfredoDev", "Error fetching route: ${request.errorBody()?.string()}")
-                    }
-                } catch (e: Exception) {
-                    Log.e("alfredoDev", "Error fetching route: ${e.message}")
-                }
-            }
-        }
     }
 
     private fun drawBackendRoute(routeResponse: BackendRouteResponse, num: Int) {
@@ -129,13 +106,18 @@ class ViewRoutesActivity : AppCompatActivity(), OnMapReadyCallback {
         swFavoriteRoute = findViewById(R.id.swFavoriteRoute)
     }
 
-    private fun initListeners(){
+    private fun initListeners() {
         cvStartRoute.setOnClickListener {
             endRoutePolyline?.remove()
             if (startRouteResponse != null) {
                 drawBackendRoute(startRouteResponse!!, 1)
             } else {
-                createRoute("$routeId-1", 1)
+                routeController.buscarRoute("$routeId-1", 1) { response ->
+                    response?.let {
+                        startRouteResponse = it
+                        drawBackendRoute(it, 1)
+                    }
+                }
             }
         }
         cvEndRoute.setOnClickListener {
@@ -143,7 +125,12 @@ class ViewRoutesActivity : AppCompatActivity(), OnMapReadyCallback {
             if (endRouteResponse != null) {
                 drawBackendRoute(endRouteResponse!!, 2)
             } else {
-                createRoute("$routeId-2", 2)
+                routeController.buscarRoute("$routeId-2", 2) { response ->
+                    response?.let {
+                        endRouteResponse = it
+                        drawBackendRoute(it, 2)
+                    }
+                }
             }
         }
         btnConfirmDirection.setOnClickListener {
