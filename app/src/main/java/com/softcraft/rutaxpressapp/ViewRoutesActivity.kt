@@ -208,7 +208,7 @@ class ViewRoutesActivity : AppCompatActivity(), OnMapReadyCallback {
         if (favoriteRoutesId.isEmpty()) {
             CoroutineScope(Dispatchers.IO).launch {
                 try {
-                    val response = ApiClient.apiService.getFavoriteRoutes(userId)
+                    val response = ApiClient.apiService.getFavoriteRoutesId(userId)
                     if (response.isSuccessful) {
                         favoriteRoutesId = response.body()?.favoriteRoutes ?: emptyList()
                         val isFavorite = favoriteRoutesId.contains(routeId)

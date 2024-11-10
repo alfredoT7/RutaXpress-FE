@@ -27,7 +27,6 @@ class LineasFilterActivity : AppCompatActivity() {
     private var allLineas: List<LineaResponse> = emptyList()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        //enableEdgeToEdge()
         setContentView(R.layout.activity_lineas_filter)
         initComponents()
         if (LineasRepository.lineas == null){

@@ -38,6 +38,7 @@ import java.io.IOException
 import java.util.Locale
 class InitialMapActivity : AppCompatActivity(), OnMapReadyCallback, OnMyLocationButtonClickListener {
     private lateinit var map: GoogleMap
+    private lateinit var cvFavoriteRoutes: CardView
     private lateinit var cvBusLines: CardView
     private lateinit var cvWhereYouGoFrom: CardView
     private lateinit var cvWhereYouGoTo: CardView
@@ -63,6 +64,7 @@ class InitialMapActivity : AppCompatActivity(), OnMapReadyCallback, OnMyLocation
         }
     }
     private fun initComponents() {
+        cvFavoriteRoutes = findViewById(R.id.cvFavoriteRoutes)
         cvBusLines = findViewById(R.id.cvBusLines)
         cvWhereYouGoFrom = findViewById(R.id.cvWhereYouGoFrom)
         cvWhereYouGoTo = findViewById(R.id.cvWhereYouGoTo)
@@ -101,7 +103,10 @@ class InitialMapActivity : AppCompatActivity(), OnMapReadyCallback, OnMyLocation
         cvBusLines = findViewById(R.id.cvBusLines)
         cvWhereYouGoFrom = findViewById(R.id.cvWhereYouGoFrom)
         cvWhereYouGoTo = findViewById(R.id.cvWhereYouGoTo)
-
+        cvFavoriteRoutes.setOnClickListener {
+            val click = Intent(this, FavoriteRoutesActivity::class.java)
+            startActivity(click)
+        }
         cvBusLines.setOnClickListener {
             // Aquí deberías abrir la actividad de filtrado de líneas
             val click = Intent(this, LineasFilterActivity::class.java)
