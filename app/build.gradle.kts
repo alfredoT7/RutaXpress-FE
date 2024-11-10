@@ -62,6 +62,7 @@ dependencies {
     implementation(libs.gson)
     implementation(libs.firebase.crashlytics)
     implementation(libs.play.services.cast.tv)
+    implementation(libs.androidx.appcompat)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
