@@ -47,6 +47,7 @@ class ViewRoutesActivity : AppCompatActivity(), OnMapReadyCallback {
     private var startRouteResponse: BackendRouteResponse? = null
     private var endRouteResponse: BackendRouteResponse? = null
     private val routeController:RouteController = RouteController()
+    private var favoriteRoutesId: List<String> = emptyList()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -55,6 +56,7 @@ class ViewRoutesActivity : AppCompatActivity(), OnMapReadyCallback {
         createFragment()
         initComponents()
         initListeners()
+        checkFavoriteStatus()
     }
 
     private fun drawBackendRoute(routeResponse: BackendRouteResponse, num: Int) {
@@ -156,9 +158,7 @@ class ViewRoutesActivity : AppCompatActivity(), OnMapReadyCallback {
             try {
                 val response = ApiClient.apiService.addFavorites(request)
                 if (response.isSuccessful) {
-                    runOnUiThread {
-                        Toast.makeText(this@ViewRoutesActivity, "Ruta añadida a favoritos", Toast.LENGTH_SHORT).show()
-                    }
+
                 } else {
                     runOnUiThread {
                         Toast.makeText(this@ViewRoutesActivity, "Error al añadir ruta a favoritos", Toast.LENGTH_SHORT).show()
@@ -199,6 +199,29 @@ class ViewRoutesActivity : AppCompatActivity(), OnMapReadyCallback {
         map.animateCamera(CameraUpdateFactory.newLatLngZoom(cocha, 8f), 300, null)
     }
 
-
-
+    private fun checkFavoriteStatus(){
+        val userId = UserRepository.userId ?:return
+        CoroutineScope(Dispatchers.IO).launch{
+            try {
+                val response = ApiClient.apiService.getFavoriteRoutes(userId)
+                if (response.isSuccessful) {
+                    val favoriteRoutes = response.body()?.favoriteRoutes ?: emptyList()
+                    val isFavorite = favoriteRoutes.contains(routeId)
+                    runOnUiThread { swFavoriteRoute.isChecked = isFavorite }
+                } else {
+                    runOnUiThread {
+                        Toast.makeText(
+                            this@ViewRoutesActivity,
+                            "Error al obtener las rutas favoritas",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                }
+            }catch (e:Exception){
+                runOnUiThread {
+                    Toast.makeText(this@ViewRoutesActivity, "Error: ${e.message}", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+    }
 }

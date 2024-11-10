@@ -29,8 +29,15 @@ interface ApiService {
 
     @POST("favorites/remove")
     suspend fun removeFavorite(@Body request: FavoriteRequest): Response<Void>
+
+    @GET("favorites/id-routes/{userId}")
+    suspend fun getFavoriteRoutes(@Path("userId") userId: String): Response<FavoriteRoutesResponse>
 }
 data class FavoriteRequest(
     val idUser: String,
     val route: String
+)
+data class FavoriteRoutesResponse(
+    val idUser: String,
+    val favoriteRoutes: List<String>
 )
