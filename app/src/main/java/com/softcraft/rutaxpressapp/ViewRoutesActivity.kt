@@ -25,7 +25,10 @@ import com.google.android.gms.maps.model.PolylineOptions
 import com.softcraft.rutaxpressapp.lineas.LineasRepository
 import com.softcraft.rutaxpressapp.routes.ApiService
 import com.softcraft.rutaxpressapp.routes.BackendRouteResponse
+import com.softcraft.rutaxpressapp.routes.FavoriteRequest
 import com.softcraft.rutaxpressapp.routes.RouteController
+import com.softcraft.rutaxpressapp.service.ApiClient
+import com.softcraft.rutaxpressapp.user.UserRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -145,15 +148,50 @@ class ViewRoutesActivity : AppCompatActivity(), OnMapReadyCallback {
             }
         }
     }
-
-    private fun eliminarRutaFavorita() {
-
-    }
-
     private fun anadirRutaFavorita() {
+        val userId = UserRepository.userId ?: return
+        val routeId = routeId ?: return
+        val request = FavoriteRequest(idUser = userId, route = routeId)
+        CoroutineScope(Dispatchers.IO).launch{
+            try {
+                val response = ApiClient.apiService.addFavorites(request)
+                if (response.isSuccessful) {
+                    runOnUiThread {
+                        Toast.makeText(this@ViewRoutesActivity, "Ruta añadida a favoritos", Toast.LENGTH_SHORT).show()
+                    }
+                } else {
+                    runOnUiThread {
+                        Toast.makeText(this@ViewRoutesActivity, "Error al añadir ruta a favoritos", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }catch (e: Exception){
+                runOnUiThread{
+                    Toast.makeText(this@ViewRoutesActivity, "Error: ${e.message}", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
 
     }
+    private fun eliminarRutaFavorita() {
+        val userId = UserRepository.userId ?: return
+        val routeId = routeId ?: return
+        val request = FavoriteRequest(idUser = userId, route = routeId)
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                val response = ApiClient.apiService.removeFavorite(request)
+                if(response.isSuccessful){
+                    runOnUiThread { Toast.makeText(this@ViewRoutesActivity, "Ruta Eliminada correctamente", Toast.LENGTH_SHORT).show() }
+                }else{
+                    runOnUiThread { Toast.makeText(this@ViewRoutesActivity, "Error al eliminar ruta", Toast.LENGTH_SHORT).show() }
+                }
 
+            }catch (e:Exception){
+                runOnUiThread {
+                    Toast.makeText(this@ViewRoutesActivity, "Error: ${e.message}", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+    }
 
     override fun onMapReady(googleMap: GoogleMap) {
         map = googleMap
