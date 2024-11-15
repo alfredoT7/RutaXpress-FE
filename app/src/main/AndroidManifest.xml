@@ -17,6 +17,9 @@
         android:theme="@style/Theme.RutaXpressApp"
         tools:targetApi="31">
         <activity
+            android:name=".HomeActivity"
+            android:exported="false" />
+        <activity
             android:name=".ViewRoutesActivity"
             android:exported="false" />
         <activity
