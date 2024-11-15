@@ -20,6 +20,9 @@
             android:name=".HomeActivity"
             android:exported="false" />
         <activity
+            android:name=".FavoriteRoutesActivity"
+            android:exported="false" />
+        <activity
             android:name=".ViewRoutesActivity"
             android:exported="false" />
         <activity

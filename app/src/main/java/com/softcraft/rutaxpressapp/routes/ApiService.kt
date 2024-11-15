@@ -1,9 +1,12 @@
 package com.softcraft.rutaxpressapp.routes
 
 import com.softcraft.rutaxpressapp.lineas.LineaResponse
+import okhttp3.RequestBody
 import retrofit2.http.GET
 import retrofit2.http.Query
 import retrofit2.Response
+import retrofit2.http.Body
+import retrofit2.http.POST
 import retrofit2.http.Path
 
 interface ApiService {
@@ -20,4 +23,29 @@ interface ApiService {
     ): Response<BackendRouteResponse>
     @GET("/descriptions/")
     suspend fun getLineas(): Response<List<LineaResponse>>
+
+    @POST("favorites/add")
+    suspend fun addFavorites(@Body request: FavoriteRequest): Response<Void>
+
+    @POST("favorites/remove")
+    suspend fun removeFavorite(@Body request: FavoriteRequest): Response<Void>
+
+    @GET("favorites/id-routes/{userId}")
+    suspend fun getFavoriteRoutesId(@Path("userId") userId: String): Response<FavoriteRoutesResponseId>
+
+    @GET("favorites/{userId}")
+    suspend fun getFavoriteRoutes(@Path("userId") userId: String): Response<FavoriteRoutesResponse>
+
 }
+data class FavoriteRequest(
+    val idUser: String,
+    val route: String
+)
+data class FavoriteRoutesResponseId(
+    val idUser: String,
+    val favoriteRoutes: List<String>
+)
+data class FavoriteRoutesResponse(
+    val idUser: String,
+    val favoriteRoutes: List<LineaResponse>
+)

@@ -13,6 +13,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.ktx.Firebase
+import com.softcraft.rutaxpressapp.user.UserRepository
 
 data class UserProfile(
     val username: String = "",
@@ -82,9 +83,8 @@ class LoginActivity : AppCompatActivity() {
 
     private fun loadUserDataAndNavigate() {
         val userId = auth.currentUser?.uid ?: return
-
         saveUserId(userId)
-
+        UserRepository.userId = userId
         db.collection("users").document(userId)
             .get()
             .addOnSuccessListener { document ->

@@ -6,6 +6,8 @@ import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.util.Log
 import android.widget.Button
+import android.widget.Switch
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.cardview.widget.CardView
 import androidx.core.content.ContextCompat
@@ -23,6 +25,10 @@ import com.google.android.gms.maps.model.PolylineOptions
 import com.softcraft.rutaxpressapp.lineas.LineasRepository
 import com.softcraft.rutaxpressapp.routes.ApiService
 import com.softcraft.rutaxpressapp.routes.BackendRouteResponse
+import com.softcraft.rutaxpressapp.routes.FavoriteRequest
+import com.softcraft.rutaxpressapp.routes.RouteController
+import com.softcraft.rutaxpressapp.service.ApiClient
+import com.softcraft.rutaxpressapp.user.UserRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -35,10 +41,13 @@ class ViewRoutesActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var cvStartRoute: CardView
     private lateinit var cvEndRoute: CardView
     private lateinit var btnConfirmDirection: Button
+    private lateinit var swFavoriteRoute:Switch
     private var startRoutePolyline: Polyline? = null
     private var endRoutePolyline: Polyline? = null
     private var startRouteResponse: BackendRouteResponse? = null
     private var endRouteResponse: BackendRouteResponse? = null
+    private val routeController:RouteController = RouteController()
+    private var favoriteRoutesId: List<String> = emptyList()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -47,31 +56,7 @@ class ViewRoutesActivity : AppCompatActivity(), OnMapReadyCallback {
         createFragment()
         initComponents()
         initListeners()
-    }
-
-    private fun createRoute(routeId: String?, num: Int) {
-        if (routeId != null) {
-            CoroutineScope(Dispatchers.IO).launch {
-                try {
-                    val request = getBackendRetrofit().create(ApiService::class.java).getBackendRoute(routeId)
-                    if (request.isSuccessful) {
-                        request.body()?.let { response ->
-                            if (num == 1) {
-                                startRouteResponse = response
-                            } else {
-                                endRouteResponse = response
-                            }
-                            drawBackendRoute(response, num)
-                            Log.i("alfredoDev", "Ruta obtenida del backend exitosamente")
-                        }
-                    } else {
-                        Log.e("alfredoDev", "Error fetching route: ${request.errorBody()?.string()}")
-                    }
-                } catch (e: Exception) {
-                    Log.e("alfredoDev", "Error fetching route: ${e.message}")
-                }
-            }
-        }
+        checkFavoriteStatus()
     }
 
     private fun drawBackendRoute(routeResponse: BackendRouteResponse, num: Int) {
@@ -123,6 +108,7 @@ class ViewRoutesActivity : AppCompatActivity(), OnMapReadyCallback {
         cvStartRoute = findViewById(R.id.cvStartRoute)
         cvEndRoute = findViewById(R.id.cvEndRoute)
         btnConfirmDirection = findViewById(R.id.btnConfirmDirection)
+        swFavoriteRoute = findViewById(R.id.swFavoriteRoute)
     }
 
     private fun initListeners() {
@@ -131,7 +117,12 @@ class ViewRoutesActivity : AppCompatActivity(), OnMapReadyCallback {
             if (startRouteResponse != null) {
                 drawBackendRoute(startRouteResponse!!, 1)
             } else {
-                createRoute("$routeId-1", 1)
+                routeController.buscarRoute("$routeId-1", 1) { response ->
+                    response?.let {
+                        startRouteResponse = it
+                        drawBackendRoute(it, 1)
+                    }
+                }
             }
         }
         cvEndRoute.setOnClickListener {
@@ -139,17 +130,107 @@ class ViewRoutesActivity : AppCompatActivity(), OnMapReadyCallback {
             if (endRouteResponse != null) {
                 drawBackendRoute(endRouteResponse!!, 2)
             } else {
-                createRoute("$routeId-2", 2)
+                routeController.buscarRoute("$routeId-2", 2) { response ->
+                    response?.let {
+                        endRouteResponse = it
+                        drawBackendRoute(it, 2)
+                    }
+                }
             }
         }
         btnConfirmDirection.setOnClickListener {
             val intent = Intent(this, InitialMapActivity::class.java)
             startActivity(intent)
         }
+        swFavoriteRoute.setOnCheckedChangeListener { _, isSelected ->
+            if (isSelected) {
+                anadirRutaFavorita()
+            } else {
+                eliminarRutaFavorita()
+            }
+        }
     }
+    private fun anadirRutaFavorita() {
+        val userId = UserRepository.userId ?: return
+        val routeId = routeId ?: return
+        val request = FavoriteRequest(idUser = userId, route = routeId)
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                val response = ApiClient.apiService.addFavorites(request)
+                if (response.isSuccessful) {
+                    favoriteRoutesId = favoriteRoutesId + routeId
+
+                } else {
+                    runOnUiThread {
+                        Toast.makeText(this@ViewRoutesActivity, "Error al añadir ruta a favoritos", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            } catch (e: Exception) {
+                runOnUiThread {
+                    Toast.makeText(this@ViewRoutesActivity, "Error: ${e.message}", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+    }
+    private fun eliminarRutaFavorita() {
+        val userId = UserRepository.userId ?: return
+        val routeId = routeId ?: return
+        val request = FavoriteRequest(idUser = userId, route = routeId)
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                val response = ApiClient.apiService.removeFavorite(request)
+                if (response.isSuccessful) {
+                    favoriteRoutesId = favoriteRoutesId - routeId
+                    runOnUiThread {
+                        Toast.makeText(this@ViewRoutesActivity, "Ruta eliminada de favoritos", Toast.LENGTH_SHORT).show()
+                    }
+                } else {
+                    runOnUiThread {
+                        Toast.makeText(this@ViewRoutesActivity, "Error al eliminar ruta de favoritos", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            } catch (e: Exception) {
+                runOnUiThread {
+                    Toast.makeText(this@ViewRoutesActivity, "Error: ${e.message}", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+    }
+
     override fun onMapReady(googleMap: GoogleMap) {
         map = googleMap
         val cocha = LatLng(-17.39509587774758, -66.16185635257042)
         map.animateCamera(CameraUpdateFactory.newLatLngZoom(cocha, 8f), 300, null)
+    }
+
+    private fun checkFavoriteStatus() {
+        val userId = UserRepository.userId ?: return
+        if (favoriteRoutesId.isEmpty()) {
+            CoroutineScope(Dispatchers.IO).launch {
+                try {
+                    val response = ApiClient.apiService.getFavoriteRoutesId(userId)
+                    if (response.isSuccessful) {
+                        favoriteRoutesId = response.body()?.favoriteRoutes ?: emptyList()
+                        val isFavorite = favoriteRoutesId.contains(routeId)
+                        runOnUiThread { swFavoriteRoute.isChecked = isFavorite }
+                    } else {
+                        runOnUiThread {
+                            Toast.makeText(
+                                this@ViewRoutesActivity,
+                                "Error al obtener las rutas favoritas",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+                    }
+                } catch (e: Exception) {
+                    runOnUiThread {
+                        Toast.makeText(this@ViewRoutesActivity, "Error: ${e.message}", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }
+        } else {
+            val isFavorite = favoriteRoutesId.contains(routeId)
+            swFavoriteRoute.isChecked = isFavorite
+        }
     }
 }

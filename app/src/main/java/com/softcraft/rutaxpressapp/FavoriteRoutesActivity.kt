@@ -4,37 +4,36 @@ import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
-import android.util.Log
-import android.view.inputmethod.EditorInfo
 import android.widget.EditText
 import android.widget.Toast
+import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.softcraft.rutaxpressapp.lineas.LineaResponse
 import com.softcraft.rutaxpressapp.lineas.LineasAdapter
-import com.softcraft.rutaxpressapp.lineas.LineasRepository
 import com.softcraft.rutaxpressapp.routes.ApiService
+import com.softcraft.rutaxpressapp.user.UserRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
-class LineasFilterActivity : AppCompatActivity() {
+class FavoriteRoutesActivity : AppCompatActivity() {
     private lateinit var rvLineas: RecyclerView
     private lateinit var lineasAdapter: LineasAdapter
-    private var allLineas: List<LineaResponse> = emptyList()
+    private lateinit var etSearchId:EditText
+    private var favoriteRoutes: List<LineaResponse> = emptyList()
+    private var allFavoriteRoutes: List<LineaResponse> = emptyList()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_lineas_filter)
+        setContentView(R.layout.activity_favorite_routes)
         initComponents()
-        if (LineasRepository.lineas == null){
-            obtenerLineas()
-        }else{
-            allLineas = LineasRepository.lineas!!
-            lineasAdapter.submitList(allLineas)
-        }
+        obtenerRutasFavoritas()
         initListeners()
     }
     private fun initComponents() {
@@ -42,8 +41,10 @@ class LineasFilterActivity : AppCompatActivity() {
         rvLineas.layoutManager = LinearLayoutManager(this)
         lineasAdapter = LineasAdapter { linea -> onLineaClick(linea) }
         rvLineas.adapter = lineasAdapter
+        etSearchId = findViewById(R.id.etSearchId)
     }
-    private fun obtenerLineas() {
+    private fun obtenerRutasFavoritas() {
+        val userId = UserRepository.userId
         CoroutineScope(Dispatchers.IO).launch {
             try {
                 val retrofit = Retrofit.Builder()
@@ -51,66 +52,51 @@ class LineasFilterActivity : AppCompatActivity() {
                     .addConverterFactory(GsonConverterFactory.create())
                     .build()
                 val apiService = retrofit.create(ApiService::class.java)
-                val response = apiService.getLineas()
+                val response = apiService.getFavoriteRoutes(userId!!)
                 if (response.isSuccessful) {
-                    response.body()?.let { lineas ->
-                        allLineas = lineas
-                        LineasRepository.lineas = lineas
+                    response.body()?.let { favoriteRoutesResponse ->
+                        allFavoriteRoutes = favoriteRoutesResponse.favoriteRoutes
+                        favoriteRoutes = allFavoriteRoutes
                         runOnUiThread {
-                            lineasAdapter.submitList(lineas)
+                            lineasAdapter.submitList(favoriteRoutes)
                         }
                     }
                 } else {
                     runOnUiThread {
-                        Toast.makeText(this@LineasFilterActivity, "Error al obtener las líneas: ${response.errorBody()?.string()}", Toast.LENGTH_LONG).show()
+                        Toast.makeText(this@FavoriteRoutesActivity, "Error al obtener las rutas favoritas: ${response.errorBody()?.string()}", Toast.LENGTH_LONG).show()
                     }
-                    Log.e("LineasFilterActivity", "Error al obtener las líneas: ${response.errorBody()?.string()}")
                 }
             } catch (e: Exception) {
                 runOnUiThread {
-                    Toast.makeText(this@LineasFilterActivity, "Excepción al obtener las líneas: ${e.message}", Toast.LENGTH_LONG).show()
+                    Toast.makeText(this@FavoriteRoutesActivity, "Excepción al obtener las rutas favoritas: ${e.message}", Toast.LENGTH_LONG).show()
                 }
-                Log.e("LineasFilterActivity", "Excepción al obtener las líneas: ${e.message}")
             }
         }
     }
+    private fun onLineaClick(linea: LineaResponse) {
+        val intent = Intent(this, ViewRoutesActivity::class.java)
+        intent.putExtra("routeId", linea.routeId)
+        startActivity(intent)
+    }
     private fun initListeners() {
-        val etSearchId: EditText = findViewById(R.id.etSearchId)
-        etSearchId.setOnEditorActionListener { v, actionId, event ->
-            if (actionId == EditorInfo.IME_ACTION_SEARCH) {
-                val id = etSearchId.text.toString()
-                if (id.isNotEmpty()) {
-                    filtrarLineas(id)
-                }
-                true
-            } else {
-                false
-            }
-        }
         etSearchId.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 if (s.isNullOrEmpty()) {
-                    lineasAdapter.submitList(allLineas)
+                    lineasAdapter.submitList(allFavoriteRoutes)
+                } else {
+                    filtrarRutas(s.toString())
                 }
             }
 
             override fun afterTextChanged(s: Editable?) {}
         })
     }
-    private fun filtrarLineas(id: String) {
-        val lineasFiltradas = allLineas.filter { it.routeId.contains(id, ignoreCase = true) }
+    private fun filtrarRutas(query: String) {
+        val rutasFiltradas = allFavoriteRoutes.filter { it.routeId.contains(query, ignoreCase = true) }
         runOnUiThread {
-            lineasAdapter.submitList(lineasFiltradas)
+            lineasAdapter.submitList(rutasFiltradas)
         }
-    }
-    private fun onLineaClick(linea: LineaResponse) {
-//        val intent = Intent(this, InitialMapActivity::class.java)
-//        intent.putExtra("routeId", linea.routeId)
-//        startActivity(intent)
-        val intent = Intent(this, ViewRoutesActivity::class.java)
-        intent.putExtra("routeId", linea.routeId)
-        startActivity(intent)
     }
 }
