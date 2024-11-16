@@ -2,6 +2,7 @@ package com.softcraft.rutaxpressapp
 
 import android.app.DatePickerDialog
 import android.content.Intent
+import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
@@ -11,7 +12,6 @@ import android.widget.ImageView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
-import android.graphics.Bitmap
 import com.bumptech.glide.Glide
 import com.cloudinary.android.MediaManager
 import com.cloudinary.android.callback.ErrorInfo
@@ -43,6 +43,8 @@ class RegisterActivity : AppCompatActivity() {
         setContentView(R.layout.activity_register)
         auth = FirebaseAuth.getInstance()
 
+        val userRole = intent.getStringExtra("USER_ROLE")
+
         // Inicializa Cloudinary
         initCloudinary()
 
@@ -51,6 +53,7 @@ class RegisterActivity : AppCompatActivity() {
 
         // Configura los listeners para los botones
         initListeners()
+        Toast.makeText(this, "Rol seleccionado: $userRole", Toast.LENGTH_SHORT).show()
     }
 
     /**
@@ -217,23 +220,31 @@ class RegisterActivity : AppCompatActivity() {
     /**
      * Guarda la información del usuario en Firebase Firestore.
      */
-    private fun saveUserToFirestore(userId: String, email: String, username: String, lastName: String, birthDate: String, phone: String, profileImageUrl: String?) {
+    private fun saveUserToFirestore(
+        userId: String,
+        email: String,
+        username: String,
+        lastName: String,
+        birthDate: String,
+        phone: String,
+        profileImageUrl: String?
+    ) {
+        val userRole = intent.getStringExtra("USER_ROLE") ?: "No especificado"
+
         val user = hashMapOf(
             "username" to username,
             "lastName" to lastName,
             "birthDate" to birthDate,
             "email" to email,
             "phone" to phone,
-            "profileImageUrl" to profileImageUrl
+            "profileImageUrl" to profileImageUrl,
+            "role" to userRole // Guardar el rol del usuario
         )
 
         val db = FirebaseFirestore.getInstance()
-        val batch = db.batch()
-
         val userRef = db.collection("users").document(userId)
-        batch.set(userRef, user)
 
-        batch.commit().addOnSuccessListener {
+        userRef.set(user).addOnSuccessListener {
             Toast.makeText(this, "Registro exitoso", Toast.LENGTH_SHORT).show()
             startActivity(Intent(this, LoginActivity::class.java))
             finish()
