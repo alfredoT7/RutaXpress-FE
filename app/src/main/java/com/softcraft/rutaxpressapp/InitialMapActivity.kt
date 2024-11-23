@@ -30,6 +30,7 @@ import com.google.android.gms.maps.model.CustomCap
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.gms.maps.model.LatLngBounds
+import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.Polyline
 import com.google.android.gms.maps.model.PolylineOptions
 import com.softcraft.rutaxpressapp.lineas.LineasRepository
@@ -47,6 +48,7 @@ class InitialMapActivity : AppCompatActivity(), OnMapReadyCallback, OnMyLocation
     private lateinit var tvUserName: TextView
     private lateinit var imgProfile: ImageView
     private var currentPolyline: Polyline? = null
+    private var currentMarker: Marker? = null
 
     companion object{
         const val REQUEST_CODE_LOCATION = 0
@@ -286,7 +288,8 @@ class InitialMapActivity : AppCompatActivity(), OnMapReadyCallback, OnMyLocation
                         val coordinates = routeResponse.geojson.features.firstOrNull()?.geometry?.coordinates
                         if (coordinates != null) {
                             val closestPoint = findClosestPointOnPolyline(userLocation, coordinates)
-                            map.addMarker(
+                            currentMarker?.remove()
+                            currentMarker = map.addMarker(
                                 MarkerOptions()
                                     .position(closestPoint)
                                     .title("Parada más cercana")
