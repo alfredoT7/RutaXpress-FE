@@ -30,6 +30,8 @@ import com.google.android.gms.maps.model.CustomCap
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.gms.maps.model.LatLngBounds
+import com.google.android.gms.maps.model.Marker
+import com.google.android.gms.maps.model.Polyline
 import com.google.android.gms.maps.model.PolylineOptions
 import com.softcraft.rutaxpressapp.lineas.LineasRepository
 import com.softcraft.rutaxpressapp.routes.BackendRouteResponse
@@ -45,6 +47,8 @@ class InitialMapActivity : AppCompatActivity(), OnMapReadyCallback, OnMyLocation
     private lateinit var tvCurrentPlace: TextView
     private lateinit var tvUserName: TextView
     private lateinit var imgProfile: ImageView
+    private var currentPolyline: Polyline? = null
+    private var currentMarker: Marker? = null
 
     companion object{
         const val REQUEST_CODE_LOCATION = 0
@@ -270,12 +274,12 @@ class InitialMapActivity : AppCompatActivity(), OnMapReadyCallback, OnMyLocation
         routeResponse.geojson.features.firstOrNull()?.geometry?.coordinates?.forEach { coordinate ->
             polylineOptions.add(LatLng(coordinate[1], coordinate[0]))
         }
-
         runOnUiThread {
-            val poly = map.addPolyline(polylineOptions)
-            poly.color = ContextCompat.getColor(this, R.color.btnColor)
-            poly.width = 12f
-            poly.endCap = CustomCap(resizeIcon(R.drawable.bus, this, 50, 50))
+            currentPolyline?.remove()
+            currentPolyline = map.addPolyline(polylineOptions)
+            currentPolyline?.color = ContextCompat.getColor(this, R.color.btnColor)
+            currentPolyline?.width = 12f
+            currentPolyline?.endCap = CustomCap(resizeIcon(R.drawable.bus, this, 50, 50))
             if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
                 val fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
                 fusedLocationClient.lastLocation.addOnSuccessListener { location ->
@@ -284,7 +288,8 @@ class InitialMapActivity : AppCompatActivity(), OnMapReadyCallback, OnMyLocation
                         val coordinates = routeResponse.geojson.features.firstOrNull()?.geometry?.coordinates
                         if (coordinates != null) {
                             val closestPoint = findClosestPointOnPolyline(userLocation, coordinates)
-                            map.addMarker(
+                            currentMarker?.remove()
+                            currentMarker = map.addMarker(
                                 MarkerOptions()
                                     .position(closestPoint)
                                     .title("Parada más cercana")
