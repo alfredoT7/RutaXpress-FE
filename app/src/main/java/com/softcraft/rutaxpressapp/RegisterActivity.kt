@@ -43,15 +43,14 @@ class RegisterActivity : AppCompatActivity() {
         setContentView(R.layout.activity_register)
         auth = FirebaseAuth.getInstance()
 
-        val userRole = intent.getStringExtra("USER_ROLE")
-
-        // Inicializa Cloudinary
+        val userRole = intent.getStringExtra("USER_ROLE") ?: "No especificado"
+        if (savedInstanceState == null) {
+            Toast.makeText(this, "Rol seleccionado: $userRole", Toast.LENGTH_SHORT).show()
+        }
         initCloudinary()
 
-        // Inicializa los componentes de la UI
         initComponents()
 
-        // Configura los listeners para los botones
         initListeners()
         Toast.makeText(this, "Rol seleccionado: $userRole", Toast.LENGTH_SHORT).show()
     }
