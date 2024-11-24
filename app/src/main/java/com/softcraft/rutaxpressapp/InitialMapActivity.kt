@@ -352,4 +352,5 @@ class InitialMapActivity : AppCompatActivity(), OnMapReadyCallback, OnMyLocation
             start.longitude + t * dx
         )
     }
+
 }

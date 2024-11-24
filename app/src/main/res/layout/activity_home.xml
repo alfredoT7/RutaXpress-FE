@@ -1,70 +1,62 @@
-<?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:gravity="center"
-    android:background="@drawable/fondo"
-    tools:context=".HomeActivity">
+    android:background="@drawable/fondo">
 
     <ImageView
         android:id="@+id/appLogo"
-        android:layout_width="376dp"
-        android:layout_height="355dp"
-        android:layout_marginBottom="24dp"
+        android:layout_width="300dp"
+        android:layout_height="300dp"
         android:contentDescription="App Logo"
-        android:src="@drawable/cambio" />
-
-
-<TextView
-    android:id="@+id/titleTextView"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:text="Elige una opción"
-    android:textColor="#E0E0E0"
-    android:textSize="24sp"
-    android:textStyle="bold"
-    android:layout_marginBottom="32dp"/>
-
-    <Button
-    android:id="@+id/driverButton"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:text="Ser Conductor"
-    android:backgroundTint="#3B82F6"
-    android:textColor="#FFFFFF"
-    android:layout_marginBottom="16dp"
-    android:padding="16dp"
-    android:textSize="18sp"
-    android:elevation="4dp"
-    android:layout_marginHorizontal="20dp"/>
-
-    <Button
-    android:id="@+id/passengerButton"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:text="Ser Pasajero"
-    android:backgroundTint="#F97316"
-    android:textColor="#FFFFFF"
-    android:padding="16dp"
-    android:textSize="18sp"
-    android:elevation="4dp"
-    android:layout_marginHorizontal="20dp"/>
-
+        android:src="@drawable/cambio"
+        android:layout_marginBottom="24dp" />
 
     <TextView
-    android:id="@+id/privacyPolicyText"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:text="Política de Privacidad"
-    android:textColor="#B0BEC5"
-    android:textSize="14sp"
-    android:layout_marginTop="40dp"
-    android:clickable="true"
-    android:textStyle="italic"
-    android:layout_marginBottom="16dp"/>
+        android:id="@+id/titleTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Elige una opción"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:textColor="#FFFFFF"
+        android:layout_marginBottom="32dp" />
 
-    </LinearLayout>
+    <Button
+        android:id="@+id/driverButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Ser Conductor"
+        android:backgroundTint="#3B82F6"
+        android:textColor="#FFFFFF"
+        android:layout_marginBottom="16dp" />
+
+    <Button
+        android:id="@+id/passengerButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Ser Pasajero"
+        android:backgroundTint="#F97316"
+        android:textColor="#FFFFFF"
+        android:layout_marginBottom="16dp" />
+
+    <Button
+        android:id="@+id/loginButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Iniciar Sesión"
+        android:backgroundTint="#4CAF50"
+        android:textColor="#FFFFFF"
+        android:layout_marginBottom="16dp" />
+
+    <Button
+        android:id="@+id/registerButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Registrarse"
+        android:backgroundTint="#FFC107"
+        android:textColor="#FFFFFF"
+        android:layout_marginBottom="16dp" />
+
+</LinearLayout>

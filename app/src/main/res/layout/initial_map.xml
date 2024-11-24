@@ -55,6 +55,7 @@
                 tools:text="Cala Cala, calle los alamos"
                 android:layout_gravity="center" />
         </LinearLayout>
+
     </RelativeLayout>
     <fragment
         android:id="@+id/map"
@@ -255,9 +256,5 @@
             android:layout_marginTop="10dp"
             >
         </Button>
-
-
-
     </androidx.cardview.widget.CardView>
-
 </LinearLayout>

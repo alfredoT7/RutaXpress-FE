@@ -11,6 +11,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.firebase.auth.FirebaseAuth
 import com.softcraft.rutaxpressapp.lineas.LineaResponse
 import com.softcraft.rutaxpressapp.lineas.LineasAdapter
 import com.softcraft.rutaxpressapp.lineas.LineasRepository
@@ -22,6 +23,7 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
 class LineasFilterActivity : AppCompatActivity() {
+    private lateinit var auth: FirebaseAuth
     private lateinit var rvLineas: RecyclerView
     private lateinit var lineasAdapter: LineasAdapter
     private var allLineas: List<LineaResponse> = emptyList()
