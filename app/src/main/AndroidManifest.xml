@@ -19,7 +19,8 @@
 
         <!-- Configurar HomeActivity como actividad de inicio -->
         <activity
-            android:name=".HomeActivity"
+
+            android:name=".LoginActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -47,7 +48,7 @@
 
         <!-- LoginActivity sin intent-filter -->
         <activity
-            android:name=".LoginActivity"
+            android:name=".HomeActivity"
             android:exported="true" />
 
         <!-- Actividades adicionales -->

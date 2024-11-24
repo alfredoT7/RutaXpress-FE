@@ -38,6 +38,7 @@ import com.softcraft.rutaxpressapp.routes.BackendRouteResponse
 import com.softcraft.rutaxpressapp.user.UserRepository
 import java.io.IOException
 import java.util.Locale
+
 class InitialMapActivity : AppCompatActivity(), OnMapReadyCallback, OnMyLocationButtonClickListener {
     private lateinit var map: GoogleMap
     private lateinit var cvFavoriteRoutes: CardView
@@ -49,17 +50,22 @@ class InitialMapActivity : AppCompatActivity(), OnMapReadyCallback, OnMyLocation
     private lateinit var imgProfile: ImageView
     private var currentPolyline: Polyline? = null
     private var currentMarker: Marker? = null
+    private var fromLocation: LatLng? = null
+    private var toLocation: LatLng? = null
+    private var fromMarker: Marker? = null
+    private var toMarker: Marker? = null
 
-    companion object{
-        const val REQUEST_CODE_LOCATION = 0
-        private const val REQUEST_CODE_SEARCH_ACTIVITY = 1
+    companion object {
+        private const val REQUEST_CODE_SEARCH_FROM = 1
+        private const val REQUEST_CODE_SEARCH_TO = 2
+        private const val REQUEST_CODE_LOCATION = 0
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.initial_map)
         initComponents()
-            loadUserProfile()
+        loadUserProfile()
         initListeners()
         if (isLocationPermissionGranted()) {
             createFragment()
@@ -67,6 +73,7 @@ class InitialMapActivity : AppCompatActivity(), OnMapReadyCallback, OnMyLocation
             requestLocationPermission()
         }
     }
+
     private fun initComponents() {
         cvFavoriteRoutes = findViewById(R.id.cvFavoriteRoutes)
         cvBusLines = findViewById(R.id.cvBusLines)
@@ -100,41 +107,33 @@ class InitialMapActivity : AppCompatActivity(), OnMapReadyCallback, OnMyLocation
         } else {
             imgProfile.setImageResource(R.drawable.ic_default_profile)
         }
-
     }
 
     private fun initListeners() {
-        cvBusLines = findViewById(R.id.cvBusLines)
-        cvWhereYouGoFrom = findViewById(R.id.cvWhereYouGoFrom)
-        cvWhereYouGoTo = findViewById(R.id.cvWhereYouGoTo)
         cvFavoriteRoutes.setOnClickListener {
             val click = Intent(this, FavoriteRoutesActivity::class.java)
             startActivity(click)
         }
         cvBusLines.setOnClickListener {
-            // Aquí deberías abrir la actividad de filtrado de líneas
             val click = Intent(this, LineasFilterActivity::class.java)
             startActivity(click)
         }
-        cvWhereYouGoFrom.setOnClickListener{ navigateToSearchActivity() }
-        cvWhereYouGoTo.setOnClickListener{ navigateToSearchActivity() }
+        cvWhereYouGoFrom.setOnClickListener { navigateToSearchActivity(REQUEST_CODE_SEARCH_FROM) }
+        cvWhereYouGoTo.setOnClickListener { navigateToSearchActivity(REQUEST_CODE_SEARCH_TO) }
         headerPlace()
     }
 
-    fun navigateToSearchActivity(){
+    fun navigateToSearchActivity(requestCode: Int) {
         val intent = Intent(this, SearchActivity::class.java)
-
         val fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
         fusedLocationClient.lastLocation.addOnSuccessListener { location ->
             if (location != null) {
-                // Si la ubicación es válida, pasamos latitud y longitud en el Intent
                 intent.putExtra("LATITUDE", location.latitude)
                 intent.putExtra("LONGITUDE", location.longitude)
             }
-            startActivityForResult(intent, REQUEST_CODE_SEARCH_ACTIVITY)
+            startActivityForResult(intent, requestCode)
         }.addOnFailureListener {
-            // solo lanzamos SearchActivity sin puts
-            startActivityForResult(intent, REQUEST_CODE_SEARCH_ACTIVITY)
+            startActivityForResult(intent, requestCode)
         }
     }
 
@@ -154,13 +153,13 @@ class InitialMapActivity : AppCompatActivity(), OnMapReadyCallback, OnMyLocation
                         val addresses: MutableList<Address>? = geocoder.getFromLocation(location.latitude, location.longitude, 1)
                         if (addresses != null) {
                             if (addresses.isNotEmpty()) {
-                                val address: Address = addresses.get(0) ?: return@addOnSuccessListener
-                                var addressText:String = address.getAddressLine(0)
+                                val address: Address = addresses[0] ?: return@addOnSuccessListener
+                                val addressText: String = address.getAddressLine(0)
                                 val arr: List<String> = addressText.split(",")
 
                                 if (arr.size > 1) {
-                                    var p1:String = arr[1]
-                                    var p2:String = arr[2]
+                                    val p1: String = arr[1]
+                                    val p2: String = arr[2]
                                     tvCurrentPlace.text = "$p1, $p2"
                                 } else {
                                     tvCurrentPlace.text = "Dirección no disponible"
@@ -204,17 +203,28 @@ class InitialMapActivity : AppCompatActivity(), OnMapReadyCallback, OnMyLocation
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
-        if (requestCode == REQUEST_CODE_SEARCH_ACTIVITY && resultCode == Activity.RESULT_OK) {
+        if (resultCode == Activity.RESULT_OK) {
             val selectedLatitude = data?.getDoubleExtra("SELECTED_LATITUDE", -1.0)
             val selectedLongitude = data?.getDoubleExtra("SELECTED_LONGITUDE", -1.0)
             val selectedAddress = data?.getStringExtra("SELECTED_ADDRESS")
 
             if (selectedLatitude != null && selectedLongitude != null) {
-                // Mover el mapa a ubicacion seleccionada
                 val selectedLocation = LatLng(selectedLatitude, selectedLongitude)
-                map.clear()
-                map.addMarker(MarkerOptions().position(selectedLocation).title(selectedAddress))
-                map.moveCamera(CameraUpdateFactory.newLatLngZoom(selectedLocation, 15f))
+                if (requestCode == REQUEST_CODE_SEARCH_FROM) {
+                    fromLocation = selectedLocation
+                    fromMarker?.remove()
+                    fromMarker = map.addMarker(MarkerOptions().position(selectedLocation).title("From: $selectedAddress"))
+                } else if (requestCode == REQUEST_CODE_SEARCH_TO) {
+                    toLocation = selectedLocation
+                    toMarker?.remove()
+                    toMarker = map.addMarker(MarkerOptions().position(selectedLocation).title("To: $selectedAddress"))
+                }
+                // Ajustar la cámara para mostrar ambos marcadores
+                val builder = LatLngBounds.Builder()
+                fromLocation?.let { builder.include(it) }
+                toLocation?.let { builder.include(it) }
+                val bounds = builder.build()
+                map.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, 100))
             }
         }
     }
@@ -269,6 +279,7 @@ class InitialMapActivity : AppCompatActivity(), OnMapReadyCallback, OnMyLocation
         Toast.makeText(this, "Ésta es tu ubicación actual", Toast.LENGTH_SHORT).show()
         return false
     }
+
     private fun drawBackendRoute(routeResponse: BackendRouteResponse) {
         val polylineOptions = PolylineOptions()
         routeResponse.geojson.features.firstOrNull()?.geometry?.coordinates?.forEach { coordinate ->
@@ -308,6 +319,7 @@ class InitialMapActivity : AppCompatActivity(), OnMapReadyCallback, OnMyLocation
             }
         }
     }
+
     private fun resizeIcon(resourceId: Int, context: Context, width: Int, height: Int): BitmapDescriptor {
         val imageBitmap = BitmapFactory.decodeResource(context.resources, resourceId)
         val scaledBitmap = Bitmap.createScaledBitmap(imageBitmap, width, height, false)
