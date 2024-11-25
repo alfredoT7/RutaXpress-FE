@@ -10,6 +10,7 @@ import android.graphics.BitmapFactory
 import android.location.Address
 import android.location.Geocoder
 import android.os.Bundle
+import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
@@ -33,11 +34,17 @@ import com.google.android.gms.maps.model.LatLngBounds
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.Polyline
 import com.google.android.gms.maps.model.PolylineOptions
+import com.google.firebase.firestore.auth.User
 import com.softcraft.rutaxpressapp.lineas.LineasRepository
 import com.softcraft.rutaxpressapp.routes.BackendRouteResponse
+import com.softcraft.rutaxpressapp.service.ApiClient
 import com.softcraft.rutaxpressapp.user.UserRepository
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import java.io.IOException
 import java.util.Locale
+
 class InitialMapActivity : AppCompatActivity(), OnMapReadyCallback, OnMyLocationButtonClickListener {
     private lateinit var map: GoogleMap
     private lateinit var cvFavoriteRoutes: CardView
@@ -47,19 +54,25 @@ class InitialMapActivity : AppCompatActivity(), OnMapReadyCallback, OnMyLocation
     private lateinit var tvCurrentPlace: TextView
     private lateinit var tvUserName: TextView
     private lateinit var imgProfile: ImageView
+    private lateinit var btnSearchTrufi:Button
     private var currentPolyline: Polyline? = null
     private var currentMarker: Marker? = null
+    private var fromLocation: LatLng? = null
+    private var toLocation: LatLng? = null
+    private var fromMarker: Marker? = null
+    private var toMarker: Marker? = null
 
-    companion object{
-        const val REQUEST_CODE_LOCATION = 0
-        private const val REQUEST_CODE_SEARCH_ACTIVITY = 1
+    companion object {
+        private const val REQUEST_CODE_SEARCH_FROM = 1
+        private const val REQUEST_CODE_SEARCH_TO = 2
+        private const val REQUEST_CODE_LOCATION = 0
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.initial_map)
         initComponents()
-            loadUserProfile()
+        loadUserProfile()
         initListeners()
         if (isLocationPermissionGranted()) {
             createFragment()
@@ -67,6 +80,7 @@ class InitialMapActivity : AppCompatActivity(), OnMapReadyCallback, OnMyLocation
             requestLocationPermission()
         }
     }
+
     private fun initComponents() {
         cvFavoriteRoutes = findViewById(R.id.cvFavoriteRoutes)
         cvBusLines = findViewById(R.id.cvBusLines)
@@ -75,6 +89,7 @@ class InitialMapActivity : AppCompatActivity(), OnMapReadyCallback, OnMyLocation
         tvCurrentPlace = findViewById(R.id.tvCurrentPlace)
         tvUserName = findViewById(R.id.tvUserName)
         imgProfile = findViewById(R.id.imgProfile)
+        btnSearchTrufi = findViewById(R.id.btnSearchTrufi)
     }
 
     private fun drawSavedRoutes() {
@@ -100,41 +115,85 @@ class InitialMapActivity : AppCompatActivity(), OnMapReadyCallback, OnMyLocation
         } else {
             imgProfile.setImageResource(R.drawable.ic_default_profile)
         }
-
     }
 
     private fun initListeners() {
-        cvBusLines = findViewById(R.id.cvBusLines)
-        cvWhereYouGoFrom = findViewById(R.id.cvWhereYouGoFrom)
-        cvWhereYouGoTo = findViewById(R.id.cvWhereYouGoTo)
         cvFavoriteRoutes.setOnClickListener {
             val click = Intent(this, FavoriteRoutesActivity::class.java)
             startActivity(click)
         }
         cvBusLines.setOnClickListener {
-            // Aquí deberías abrir la actividad de filtrado de líneas
             val click = Intent(this, LineasFilterActivity::class.java)
             startActivity(click)
         }
-        cvWhereYouGoFrom.setOnClickListener{ navigateToSearchActivity() }
-        cvWhereYouGoTo.setOnClickListener{ navigateToSearchActivity() }
+        cvWhereYouGoFrom.setOnClickListener { navigateToSearchActivity(REQUEST_CODE_SEARCH_FROM) }
+        cvWhereYouGoTo.setOnClickListener { navigateToSearchActivity(REQUEST_CODE_SEARCH_TO) }
         headerPlace()
+        btnSearchTrufi.setOnClickListener {
+            queryBestRoute()
+        }
     }
+    private fun queryBestRoute(){
+        val fromLocation = UserRepository.userFromLocation
+        val toLocation = UserRepository.userToLocation
+        if(fromLocation != null && toLocation != null){
+            CoroutineScope(Dispatchers.IO).launch{
+                try {
+                    val response = ApiClient.apiService.findRoute(fromLocation.longitude, fromLocation.latitude, toLocation.longitude, toLocation.latitude)
 
-    fun navigateToSearchActivity(){
+                    if(response.isSuccessful){
+                        val routeId = response.body()?.routeId
+                        if(routeId!=null){
+                            runOnUiThread{
+                                Toast.makeText(this@InitialMapActivity, "$routeId",Toast.LENGTH_LONG).show()
+                            }
+                            val backendRouteResponse = ApiClient.apiService.getBackendRoute(routeId)
+                            if(backendRouteResponse.isSuccessful){
+                                val routeResponse = backendRouteResponse.body()
+                                if (routeResponse != null){
+                                    runOnUiThread { drawBackendRoute(routeResponse) }
+                                }else {
+                                    runOnUiThread {
+                                        Toast.makeText(this@InitialMapActivity, "Error al obtener la ruta", Toast.LENGTH_LONG).show()
+                                    }
+                                }
+                            }else{
+                                runOnUiThread {
+                                    Toast.makeText(this@InitialMapActivity, "Error al obtener la ruta", Toast.LENGTH_LONG).show()
+                                }
+                            }
+                        }else{
+                            runOnUiThread {
+                                Toast.makeText(this@InitialMapActivity, "Coordenadas inválidas", Toast.LENGTH_LONG).show()
+                            }
+                        }
+                    }else{
+                        runOnUiThread {
+                            Toast.makeText(this@InitialMapActivity, "Coordenadas inválidas", Toast.LENGTH_LONG).show()
+                        }
+                    }
+                }catch (e :Exception){
+                    runOnUiThread {
+                        Toast.makeText(this@InitialMapActivity, "Coordenadas inválidas", Toast.LENGTH_LONG).show()
+                    }   
+                }
+
+            }
+        }else{
+            Toast.makeText(this, "una de las coordenadas falta", Toast.LENGTH_SHORT).show()
+        }
+    }
+    fun navigateToSearchActivity(requestCode: Int) {
         val intent = Intent(this, SearchActivity::class.java)
-
         val fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
         fusedLocationClient.lastLocation.addOnSuccessListener { location ->
             if (location != null) {
-                // Si la ubicación es válida, pasamos latitud y longitud en el Intent
                 intent.putExtra("LATITUDE", location.latitude)
                 intent.putExtra("LONGITUDE", location.longitude)
             }
-            startActivityForResult(intent, REQUEST_CODE_SEARCH_ACTIVITY)
+            startActivityForResult(intent, requestCode)
         }.addOnFailureListener {
-            // solo lanzamos SearchActivity sin puts
-            startActivityForResult(intent, REQUEST_CODE_SEARCH_ACTIVITY)
+            startActivityForResult(intent, requestCode)
         }
     }
 
@@ -154,13 +213,13 @@ class InitialMapActivity : AppCompatActivity(), OnMapReadyCallback, OnMyLocation
                         val addresses: MutableList<Address>? = geocoder.getFromLocation(location.latitude, location.longitude, 1)
                         if (addresses != null) {
                             if (addresses.isNotEmpty()) {
-                                val address: Address = addresses.get(0) ?: return@addOnSuccessListener
-                                var addressText:String = address.getAddressLine(0)
+                                val address: Address = addresses[0] ?: return@addOnSuccessListener
+                                val addressText: String = address.getAddressLine(0)
                                 val arr: List<String> = addressText.split(",")
 
                                 if (arr.size > 1) {
-                                    var p1:String = arr[1]
-                                    var p2:String = arr[2]
+                                    val p1: String = arr[1]
+                                    val p2: String = arr[2]
                                     tvCurrentPlace.text = "$p1, $p2"
                                 } else {
                                     tvCurrentPlace.text = "Dirección no disponible"
@@ -204,17 +263,30 @@ class InitialMapActivity : AppCompatActivity(), OnMapReadyCallback, OnMyLocation
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
-        if (requestCode == REQUEST_CODE_SEARCH_ACTIVITY && resultCode == Activity.RESULT_OK) {
+        if (resultCode == Activity.RESULT_OK) {
             val selectedLatitude = data?.getDoubleExtra("SELECTED_LATITUDE", -1.0)
             val selectedLongitude = data?.getDoubleExtra("SELECTED_LONGITUDE", -1.0)
             val selectedAddress = data?.getStringExtra("SELECTED_ADDRESS")
 
             if (selectedLatitude != null && selectedLongitude != null) {
-                // Mover el mapa a ubicacion seleccionada
                 val selectedLocation = LatLng(selectedLatitude, selectedLongitude)
-                map.clear()
-                map.addMarker(MarkerOptions().position(selectedLocation).title(selectedAddress))
-                map.moveCamera(CameraUpdateFactory.newLatLngZoom(selectedLocation, 15f))
+                if (requestCode == REQUEST_CODE_SEARCH_FROM) {
+                    fromLocation = selectedLocation
+                    fromMarker?.remove()
+                    fromMarker = map.addMarker(MarkerOptions().position(selectedLocation).title("From: $selectedAddress"))
+                    UserRepository.userFromLocation = selectedLocation
+                } else if (requestCode == REQUEST_CODE_SEARCH_TO) {
+                    toLocation = selectedLocation
+                    toMarker?.remove()
+                    toMarker = map.addMarker(MarkerOptions().position(selectedLocation).title("To: $selectedAddress"))
+                    UserRepository.userToLocation = selectedLocation
+                }
+                // Ajustar la cámara para mostrar ambos marcadores
+                val builder = LatLngBounds.Builder()
+                fromLocation?.let { builder.include(it) }
+                toLocation?.let { builder.include(it) }
+                val bounds = builder.build()
+                map.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, 100))
             }
         }
     }
@@ -269,6 +341,7 @@ class InitialMapActivity : AppCompatActivity(), OnMapReadyCallback, OnMyLocation
         Toast.makeText(this, "Ésta es tu ubicación actual", Toast.LENGTH_SHORT).show()
         return false
     }
+
     private fun drawBackendRoute(routeResponse: BackendRouteResponse) {
         val polylineOptions = PolylineOptions()
         routeResponse.geojson.features.firstOrNull()?.geometry?.coordinates?.forEach { coordinate ->
@@ -308,6 +381,7 @@ class InitialMapActivity : AppCompatActivity(), OnMapReadyCallback, OnMyLocation
             }
         }
     }
+
     private fun resizeIcon(resourceId: Int, context: Context, width: Int, height: Int): BitmapDescriptor {
         val imageBitmap = BitmapFactory.decodeResource(context.resources, resourceId)
         val scaledBitmap = Bitmap.createScaledBitmap(imageBitmap, width, height, false)
