@@ -10,6 +10,7 @@ import android.graphics.BitmapFactory
 import android.location.Address
 import android.location.Geocoder
 import android.os.Bundle
+import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
@@ -33,9 +34,14 @@ import com.google.android.gms.maps.model.LatLngBounds
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.Polyline
 import com.google.android.gms.maps.model.PolylineOptions
+import com.google.firebase.firestore.auth.User
 import com.softcraft.rutaxpressapp.lineas.LineasRepository
 import com.softcraft.rutaxpressapp.routes.BackendRouteResponse
+import com.softcraft.rutaxpressapp.service.ApiClient
 import com.softcraft.rutaxpressapp.user.UserRepository
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import java.io.IOException
 import java.util.Locale
 
@@ -48,6 +54,7 @@ class InitialMapActivity : AppCompatActivity(), OnMapReadyCallback, OnMyLocation
     private lateinit var tvCurrentPlace: TextView
     private lateinit var tvUserName: TextView
     private lateinit var imgProfile: ImageView
+    private lateinit var btnSearchTrufi:Button
     private var currentPolyline: Polyline? = null
     private var currentMarker: Marker? = null
     private var fromLocation: LatLng? = null
@@ -82,6 +89,7 @@ class InitialMapActivity : AppCompatActivity(), OnMapReadyCallback, OnMyLocation
         tvCurrentPlace = findViewById(R.id.tvCurrentPlace)
         tvUserName = findViewById(R.id.tvUserName)
         imgProfile = findViewById(R.id.imgProfile)
+        btnSearchTrufi = findViewById(R.id.btnSearchTrufi)
     }
 
     private fun drawSavedRoutes() {
@@ -121,8 +129,60 @@ class InitialMapActivity : AppCompatActivity(), OnMapReadyCallback, OnMyLocation
         cvWhereYouGoFrom.setOnClickListener { navigateToSearchActivity(REQUEST_CODE_SEARCH_FROM) }
         cvWhereYouGoTo.setOnClickListener { navigateToSearchActivity(REQUEST_CODE_SEARCH_TO) }
         headerPlace()
+        btnSearchTrufi.setOnClickListener {
+            queryBestRoute()
+        }
     }
+    private fun queryBestRoute(){
+        val fromLocation = UserRepository.userFromLocation
+        val toLocation = UserRepository.userToLocation
+        if(fromLocation != null && toLocation != null){
+            CoroutineScope(Dispatchers.IO).launch{
+                try {
+                    val response = ApiClient.apiService.findRoute(fromLocation.longitude, fromLocation.latitude, toLocation.longitude, toLocation.latitude)
 
+                    if(response.isSuccessful){
+                        val routeId = response.body()?.routeId
+                        if(routeId!=null){
+                            runOnUiThread{
+                                Toast.makeText(this@InitialMapActivity, "$routeId",Toast.LENGTH_LONG).show()
+                            }
+                            val backendRouteResponse = ApiClient.apiService.getBackendRoute(routeId)
+                            if(backendRouteResponse.isSuccessful){
+                                val routeResponse = backendRouteResponse.body()
+                                if (routeResponse != null){
+                                    runOnUiThread { drawBackendRoute(routeResponse) }
+                                }else {
+                                    runOnUiThread {
+                                        Toast.makeText(this@InitialMapActivity, "Error al obtener la ruta", Toast.LENGTH_LONG).show()
+                                    }
+                                }
+                            }else{
+                                runOnUiThread {
+                                    Toast.makeText(this@InitialMapActivity, "Error al obtener la ruta", Toast.LENGTH_LONG).show()
+                                }
+                            }
+                        }else{
+                            runOnUiThread {
+                                Toast.makeText(this@InitialMapActivity, "Coordenadas inválidas", Toast.LENGTH_LONG).show()
+                            }
+                        }
+                    }else{
+                        runOnUiThread {
+                            Toast.makeText(this@InitialMapActivity, "Coordenadas inválidas", Toast.LENGTH_LONG).show()
+                        }
+                    }
+                }catch (e :Exception){
+                    runOnUiThread {
+                        Toast.makeText(this@InitialMapActivity, "Coordenadas inválidas", Toast.LENGTH_LONG).show()
+                    }   
+                }
+
+            }
+        }else{
+            Toast.makeText(this, "una de las coordenadas falta", Toast.LENGTH_SHORT).show()
+        }
+    }
     fun navigateToSearchActivity(requestCode: Int) {
         val intent = Intent(this, SearchActivity::class.java)
         val fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
@@ -214,10 +274,12 @@ class InitialMapActivity : AppCompatActivity(), OnMapReadyCallback, OnMyLocation
                     fromLocation = selectedLocation
                     fromMarker?.remove()
                     fromMarker = map.addMarker(MarkerOptions().position(selectedLocation).title("From: $selectedAddress"))
+                    UserRepository.userFromLocation = selectedLocation
                 } else if (requestCode == REQUEST_CODE_SEARCH_TO) {
                     toLocation = selectedLocation
                     toMarker?.remove()
                     toMarker = map.addMarker(MarkerOptions().position(selectedLocation).title("To: $selectedAddress"))
+                    UserRepository.userToLocation = selectedLocation
                 }
                 // Ajustar la cámara para mostrar ambos marcadores
                 val builder = LatLngBounds.Builder()
