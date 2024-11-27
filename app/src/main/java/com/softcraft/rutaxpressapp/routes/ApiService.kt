@@ -11,7 +11,7 @@ import retrofit2.http.Path
 
 interface ApiService {
     @GET("/v2/directions/driving-car")
-    suspend fun getRoute(
+    suspend fun getRouteApiService(
         @Query("api_key") key: String,
         @Query("start", encoded = true) start: String,
         @Query("end", encoded = true) end: String

@@ -10,6 +10,7 @@ import android.graphics.BitmapFactory
 import android.location.Address
 import android.location.Geocoder
 import android.os.Bundle
+import android.util.Log
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
@@ -28,6 +29,8 @@ import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.model.BitmapDescriptor
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.CustomCap
+import com.google.android.gms.maps.model.Dot
+import com.google.android.gms.maps.model.Gap
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.gms.maps.model.LatLngBounds
@@ -36,12 +39,16 @@ import com.google.android.gms.maps.model.Polyline
 import com.google.android.gms.maps.model.PolylineOptions
 import com.google.firebase.firestore.auth.User
 import com.softcraft.rutaxpressapp.lineas.LineasRepository
+import com.softcraft.rutaxpressapp.routes.ApiService
 import com.softcraft.rutaxpressapp.routes.BackendRouteResponse
+import com.softcraft.rutaxpressapp.routes.RouteResponse
 import com.softcraft.rutaxpressapp.service.ApiClient
 import com.softcraft.rutaxpressapp.user.UserRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
 import java.io.IOException
 import java.util.Locale
 
@@ -368,6 +375,7 @@ class InitialMapActivity : AppCompatActivity(), OnMapReadyCallback, OnMyLocation
                                     .title("Parada más cercana")
                                     .icon(resizeIcon(R.drawable.bus_stop, this, 100, 100))
                             )
+                            createRoute(userLocation, closestPoint)
                             val bounds = LatLngBounds.Builder()
                                 .include(userLocation)
                                 .include(closestPoint)
@@ -431,5 +439,37 @@ class InitialMapActivity : AppCompatActivity(), OnMapReadyCallback, OnMyLocation
             start.longitude + t * dx
         )
     }
-
+    private fun getRetrofit(): Retrofit {
+        return Retrofit.Builder()
+            .baseUrl("https://api.openrouteservice.org/")
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+    }
+    private fun drawRoute(routeResponse: RouteResponse?) {
+        val polylineOptions = PolylineOptions()
+        routeResponse?.features?.first()?.geometry?.coordinates?.forEach {
+            polylineOptions.add(LatLng(it[1], it[0]))
+        }
+        runOnUiThread {
+            val poly = map.addPolyline(polylineOptions)
+            poly.color = ContextCompat.getColor(this, R.color.routeMap)
+            poly.pattern = listOf(Dot(), Gap(10f))
+        }
+    }
+    private fun createRoute(start: LatLng, end: LatLng) {
+        CoroutineScope(Dispatchers.IO).launch {
+            val call = getRetrofit().create(ApiService::class.java)
+                .getRouteApiService(
+                    "5b3ce3597851110001cf6248e6564815347a41768ab3ab3cf1098048",
+                    "${start.longitude},${start.latitude}",
+                    "${end.longitude},${end.latitude}"
+                )
+            if (call.isSuccessful) {
+                drawRoute(call.body())
+                Log.i("alfredoDev", "OK")
+            } else {
+                Log.i("alfredoDev", "NOT OK")
+            }
+        }
+    }
 }
