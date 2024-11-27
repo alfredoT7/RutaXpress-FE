@@ -62,6 +62,8 @@ class InitialMapActivity : AppCompatActivity(), OnMapReadyCallback, OnMyLocation
     private lateinit var tvUserName: TextView
     private lateinit var imgProfile: ImageView
     private lateinit var btnSearchTrufi:Button
+    private lateinit var tvDesdeDondeVas: TextView
+    private lateinit var tvADondeVas:TextView
     private var currentPolyline: Polyline? = null
     private var currentMarker: Marker? = null
     private var fromLocation: LatLng? = null
@@ -97,6 +99,8 @@ class InitialMapActivity : AppCompatActivity(), OnMapReadyCallback, OnMyLocation
         tvUserName = findViewById(R.id.tvUserName)
         imgProfile = findViewById(R.id.imgProfile)
         btnSearchTrufi = findViewById(R.id.btnSearchTrufi)
+        tvDesdeDondeVas = findViewById(R.id.tvDesdeDondeVas)
+        tvADondeVas = findViewById(R.id.tvADondeVas)
     }
 
     private fun drawSavedRoutes() {
@@ -282,13 +286,14 @@ class InitialMapActivity : AppCompatActivity(), OnMapReadyCallback, OnMyLocation
                     fromMarker?.remove()
                     fromMarker = map.addMarker(MarkerOptions().position(selectedLocation).title("From: $selectedAddress"))
                     UserRepository.userFromLocation = selectedLocation
+                    tvDesdeDondeVas.text = getPlaceWithCoordenate(UserRepository.userFromLocation!!)
                 } else if (requestCode == REQUEST_CODE_SEARCH_TO) {
                     toLocation = selectedLocation
                     toMarker?.remove()
                     toMarker = map.addMarker(MarkerOptions().position(selectedLocation).title("To: $selectedAddress"))
                     UserRepository.userToLocation = selectedLocation
+                    tvADondeVas.text = getPlaceWithCoordenate(UserRepository.userToLocation!!)
                 }
-                // Ajustar la cámara para mostrar ambos marcadores
                 val builder = LatLngBounds.Builder()
                 fromLocation?.let { builder.include(it) }
                 toLocation?.let { builder.include(it) }
@@ -297,6 +302,21 @@ class InitialMapActivity : AppCompatActivity(), OnMapReadyCallback, OnMyLocation
             }
         }
     }
+    private fun getPlaceWithCoordenate(coordinate: LatLng): String {
+        val geocoder = Geocoder(this, Locale.getDefault())
+        return try {
+            val addresses: List<Address> = geocoder.getFromLocation(coordinate.latitude, coordinate.longitude, 1) ?: emptyList()
+            if (addresses.isNotEmpty()) {
+                addresses[0].getAddressLine(0)
+            } else {
+                "Dirección no disponible"
+            }
+        } catch (e: IOException) {
+            e.printStackTrace()
+            "Error al obtener la dirección"
+        }
+    }
+
 
     private fun isLocationPermissionGranted() =
         ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
