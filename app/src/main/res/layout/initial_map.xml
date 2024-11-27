@@ -180,6 +180,7 @@
             app:cardElevation="0dp"
             >
             <TextView
+                android:id="@+id/tvDesdeDondeVas"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
@@ -230,6 +231,7 @@
         app:cardElevation="0dp"
         >
         <TextView
+            android:id="@+id/tvADondeVas"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
