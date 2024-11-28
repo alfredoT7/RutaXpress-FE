@@ -113,10 +113,7 @@ class InitialMapActivity : AppCompatActivity(), OnMapReadyCallback, OnMyLocation
         val sharedPref = getSharedPreferences("UserPrefs", Context.MODE_PRIVATE)
         val userName = sharedPref.getString("username", "Usuario")
         val profileImageUrl = sharedPref.getString("profileImageUrl", null)
-
-        // Mostrar nombre del usuario
         tvUserName.text = userName
-        // Mostrar imagen del perfil usando Glide
         if (profileImageUrl != null && profileImageUrl.isNotEmpty()) {
             Glide.with(this)
                 .load(profileImageUrl)
@@ -151,7 +148,6 @@ class InitialMapActivity : AppCompatActivity(), OnMapReadyCallback, OnMyLocation
             CoroutineScope(Dispatchers.IO).launch{
                 try {
                     val response = ApiClient.apiService.findRoute(fromLocation.longitude, fromLocation.latitude, toLocation.longitude, toLocation.latitude)
-
                     if(response.isSuccessful){
                         val routeId = response.body()?.routeId
                         if(routeId!=null){
@@ -188,7 +184,6 @@ class InitialMapActivity : AppCompatActivity(), OnMapReadyCallback, OnMyLocation
                         Toast.makeText(this@InitialMapActivity, "Coordenadas inválidas", Toast.LENGTH_LONG).show()
                     }   
                 }
-
             }
         }else{
             Toast.makeText(this, "una de las coordenadas falta", Toast.LENGTH_SHORT).show()
@@ -207,12 +202,10 @@ class InitialMapActivity : AppCompatActivity(), OnMapReadyCallback, OnMyLocation
             startActivityForResult(intent, requestCode)
         }
     }
-
     private fun createFragment() {
         val mapFragment: SupportMapFragment = supportFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
     }
-
     private fun headerPlace() {
         val fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
         tvCurrentPlace = findViewById(R.id.tvCurrentPlace)
@@ -227,11 +220,10 @@ class InitialMapActivity : AppCompatActivity(), OnMapReadyCallback, OnMyLocation
                                 val address: Address = addresses[0] ?: return@addOnSuccessListener
                                 val addressText: String = address.getAddressLine(0)
                                 val arr: List<String> = addressText.split(",")
-
                                 if (arr.size > 1) {
+                                    val p0: String = arr[0]
                                     val p1: String = arr[1]
-                                    val p2: String = arr[2]
-                                    tvCurrentPlace.text = "$p1, $p2"
+                                    tvCurrentPlace.text = "$p0, $p1"
                                 } else {
                                     tvCurrentPlace.text = "Dirección no disponible"
                                 }
