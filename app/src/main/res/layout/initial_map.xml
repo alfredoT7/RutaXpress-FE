@@ -196,6 +196,7 @@
 
 
         <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btnSelectMyLocation"
             android:layout_width="0dp"
             android:layout_height="55dp"
             android:text="Seleccionar mi ubicación actual"
