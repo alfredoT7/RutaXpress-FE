@@ -145,7 +145,7 @@ class InitialMapActivity : AppCompatActivity(), OnMapReadyCallback,
             queryBestRoute()
         }
         btnSelectMyLocation.setOnClickListener {
-
+            selectMyLocation()
         }
     }
 
@@ -549,6 +549,26 @@ class InitialMapActivity : AppCompatActivity(), OnMapReadyCallback,
             } else {
                 Log.i("alfredoDev", "NOT OK")
             }
+        }
+    }
+    private fun selectMyLocation(){
+        val currentLocation = LocationServices.getFusedLocationProviderClient(this)
+        if(ActivityCompat.checkSelfPermission(this,Manifest.permission.ACCESS_FINE_LOCATION)==PackageManager.PERMISSION_GRANTED){
+            currentLocation.lastLocation.addOnSuccessListener {
+                location ->
+                if (location != null){
+                    val userLocation = LatLng(location.latitude,location.longitude)
+                    UserRepository.userFromLocation=userLocation
+                    val lugar = getPlaceWithCoordenate(userLocation)
+                    tvDesdeDondeVas.text = lugar
+                }else{
+                    tvDesdeDondeVas.text = "Ubicacion no disponible"
+                }
+            }.addOnFailureListener {
+                tvDesdeDondeVas.text = "Error al obtener la ubicación"
+            }
+        }else{
+            tvDesdeDondeVas.text = "Permiso de ubicacion no concedido"
         }
     }
 }
