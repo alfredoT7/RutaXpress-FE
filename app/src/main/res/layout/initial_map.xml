@@ -185,6 +185,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:paddingHorizontal="30dp"
+                android:textStyle="bold"
                 android:textSize="15sp"
                 android:hint="Escribe o elige tu ubicación en el mapa"
                 android:maxLines="1"
@@ -196,6 +197,7 @@
 
 
         <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btnSelectMyLocation"
             android:layout_width="0dp"
             android:layout_height="55dp"
             android:text="Seleccionar mi ubicación actual"
@@ -237,6 +239,7 @@
             android:layout_gravity="center"
             android:paddingHorizontal="30dp"
             android:textSize="15sp"
+            android:textStyle="bold"
             android:hint="Escribe o elige tu ubicación en el mapa"
             android:maxLines="1"
             android:singleLine="true"

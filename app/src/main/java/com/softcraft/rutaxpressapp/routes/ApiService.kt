@@ -10,7 +10,7 @@ import retrofit2.http.POST
 import retrofit2.http.Path
 
 interface ApiService {
-    @GET("/v2/directions/driving-car")
+    @GET("/v2/directions/foot-walking")
     suspend fun getRouteApiService(
         @Query("api_key") key: String,
         @Query("start", encoded = true) start: String,
