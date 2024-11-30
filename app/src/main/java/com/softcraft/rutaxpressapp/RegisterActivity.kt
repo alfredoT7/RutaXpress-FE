@@ -47,12 +47,17 @@ class RegisterActivity : AppCompatActivity() {
         if (savedInstanceState == null) {
             Toast.makeText(this, "Rol seleccionado: $userRole", Toast.LENGTH_SHORT).show()
         }
+        if (userRole.equals("Conductor")){
+            registerDriver()
+        }
         initCloudinary()
-
         initComponents()
-
         initListeners()
         Toast.makeText(this, "Rol seleccionado: $userRole", Toast.LENGTH_SHORT).show()
+    }
+
+    private fun registerDriver() {
+
     }
 
     /**

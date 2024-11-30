@@ -63,7 +63,9 @@
             }
 
             tvRegister.setOnClickListener {
-                val intent = Intent(this, RegisterActivity::class.java)
+                //val intent = Intent(this, RegisterActivity::class.java)
+                //startActivity(intent)
+                val intent = Intent(this, HomeActivity::class.java)
                 startActivity(intent)
             }
         }

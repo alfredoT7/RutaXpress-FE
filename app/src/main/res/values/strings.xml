@@ -34,4 +34,5 @@
     <string name="markers">Marcadores:</string>
     <string name="favorites_lines">Tus lineas favoritas</string>
     <string name="contrase_a">Contraseña</string>
+    <string name="validations">Validaciones Extra</string>
 </resources>
