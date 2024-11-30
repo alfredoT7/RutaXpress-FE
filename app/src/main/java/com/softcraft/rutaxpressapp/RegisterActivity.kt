@@ -18,6 +18,7 @@ import com.cloudinary.android.callback.ErrorInfo
 import com.cloudinary.android.callback.UploadCallback
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.softcraft.rutaxpressapp.DriverView.RegisterDriverActivity
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
@@ -47,7 +48,7 @@ class RegisterActivity : AppCompatActivity() {
         if (savedInstanceState == null) {
             Toast.makeText(this, "Rol seleccionado: $userRole", Toast.LENGTH_SHORT).show()
         }
-        if (userRole.equals("Conductor")){
+        if (userRole.equals("Conductor")) {
             registerDriver()
         }
         initCloudinary()
@@ -100,7 +101,16 @@ class RegisterActivity : AppCompatActivity() {
             val birthDate = etBirthDate.text.toString().trim()
             val phone = etPhone.text.toString().trim()
 
-            if (validateInputs(email, password, confirmPassword, username, lastName, birthDate, phone)) {
+            if (validateInputs(
+                    email,
+                    password,
+                    confirmPassword,
+                    username,
+                    lastName,
+                    birthDate,
+                    phone
+                )
+            ) {
                 registerUserWithFirebase(email, password, username, lastName, birthDate, phone)
             }
         }
@@ -120,7 +130,6 @@ class RegisterActivity : AppCompatActivity() {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == 1000 && resultCode == RESULT_OK) {
             selectedImageUri = data?.data
-            // Muestra la imagen seleccionada usando Glide
             Glide.with(this)
                 .load(selectedImageUri)
                 .placeholder(R.drawable.ic_default_profile)
@@ -137,16 +146,25 @@ class RegisterActivity : AppCompatActivity() {
         val month = calendar.get(Calendar.MONTH)
         val day = calendar.get(Calendar.DAY_OF_MONTH)
 
-        val datePickerDialog = DatePickerDialog(this, { _, selectedYear, selectedMonth, selectedDay ->
-            etBirthDate.setText("$selectedDay/${selectedMonth + 1}/$selectedYear")
-        }, year, month, day)
+        val datePickerDialog =
+            DatePickerDialog(this, { _, selectedYear, selectedMonth, selectedDay ->
+                etBirthDate.setText("$selectedDay/${selectedMonth + 1}/$selectedYear")
+            }, year, month, day)
         datePickerDialog.show()
     }
 
     /**
      * Valida los campos de entrada del formulario de registro.
      */
-    private fun validateInputs(email: String, password: String, confirmPassword: String, username: String, lastName: String, birthDate: String, phone: String): Boolean {
+    private fun validateInputs(
+        email: String,
+        password: String,
+        confirmPassword: String,
+        username: String,
+        lastName: String,
+        birthDate: String,
+        phone: String
+    ): Boolean {
         val errorMessages = mutableListOf<String>()
         if (username.isEmpty()) errorMessages.add("El nombre de usuario está vacío")
         if (lastName.isEmpty()) errorMessages.add("El apellido está vacío")
@@ -167,7 +185,14 @@ class RegisterActivity : AppCompatActivity() {
     /**
      * Registra un usuario en Firebase Authentication.
      */
-    private fun registerUserWithFirebase(email: String, password: String, username: String, lastName: String, birthDate: String, phone: String) {
+    private fun registerUserWithFirebase(
+        email: String,
+        password: String,
+        username: String,
+        lastName: String,
+        birthDate: String,
+        phone: String
+    ) {
         lifecycleScope.launch {
             try {
                 withContext(Dispatchers.IO) {
@@ -176,7 +201,11 @@ class RegisterActivity : AppCompatActivity() {
                 val userId = auth.currentUser?.uid ?: return@launch
                 uploadProfileImage(userId, email, username, lastName, birthDate, phone)
             } catch (e: Exception) {
-                Toast.makeText(this@RegisterActivity, "Error al registrar usuario", Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                    this@RegisterActivity,
+                    "Error al registrar usuario",
+                    Toast.LENGTH_SHORT
+                ).show()
             }
         }
     }
@@ -187,14 +216,21 @@ class RegisterActivity : AppCompatActivity() {
     private fun compressImage(uri: Uri): ByteArray {
         val bitmap = MediaStore.Images.Media.getBitmap(contentResolver, uri)
         val outputStream = ByteArrayOutputStream()
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 50, outputStream) // Comprime al 50%
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 50, outputStream)
         return outputStream.toByteArray()
     }
 
     /**
      * Sube la imagen de perfil del usuario a Cloudinary.
      */
-    private fun uploadProfileImage(userId: String, email: String, username: String, lastName: String, birthDate: String, phone: String) {
+    private fun uploadProfileImage(
+        userId: String,
+        email: String,
+        username: String,
+        lastName: String,
+        birthDate: String,
+        phone: String
+    ) {
         if (selectedImageUri != null) {
             val compressedImage = compressImage(selectedImageUri!!)
             MediaManager.get().upload(compressedImage)
@@ -206,11 +242,23 @@ class RegisterActivity : AppCompatActivity() {
 
                     override fun onSuccess(requestId: String, resultData: Map<*, *>) {
                         val profileImageUrl = resultData["secure_url"] as String
-                        saveUserToFirestore(userId, email, username, lastName, birthDate, phone, profileImageUrl)
+                        saveUserToFirestore(
+                            userId,
+                            email,
+                            username,
+                            lastName,
+                            birthDate,
+                            phone,
+                            profileImageUrl
+                        )
                     }
 
                     override fun onError(requestId: String, error: ErrorInfo) {
-                        Toast.makeText(this@RegisterActivity, "Error al subir la imagen: ${error.description}", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(
+                            this@RegisterActivity,
+                            "Error al subir la imagen: ${error.description}",
+                            Toast.LENGTH_SHORT
+                        ).show()
                     }
 
                     override fun onReschedule(requestId: String, error: ErrorInfo) {}
@@ -242,7 +290,7 @@ class RegisterActivity : AppCompatActivity() {
             "email" to email,
             "phone" to phone,
             "profileImageUrl" to profileImageUrl,
-            "role" to userRole // Guardar el rol del usuario
+            "role" to userRole
         )
 
         val db = FirebaseFirestore.getInstance()
@@ -250,10 +298,59 @@ class RegisterActivity : AppCompatActivity() {
 
         userRef.set(user).addOnSuccessListener {
             Toast.makeText(this, "Registro exitoso", Toast.LENGTH_SHORT).show()
-            startActivity(Intent(this, LoginActivity::class.java))
-            finish()
+            if (userRole == "Conductor") {
+                saveDriverToFirestore(
+                    userId,
+                    username,
+                    lastName,
+                    email,
+                    phone,
+                    birthDate,
+                    profileImageUrl
+                )
+            } else {
+                startActivity(Intent(this, LoginActivity::class.java))
+                finish()
+            }
         }.addOnFailureListener { e ->
             Toast.makeText(this, "Error al guardar datos: ${e.message}", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun saveDriverToFirestore(
+        userId: String,
+        username: String,
+        lastName: String,
+        email: String,
+        phone: String,
+        birthDate: String,
+        profileImageUrl: String?
+    ) {
+        val driver = hashMapOf(
+            "username" to username,
+            "lastName" to lastName,
+            "email" to email,
+            "phone" to phone,
+            "birthDate" to birthDate,
+            "profileImageUrl" to profileImageUrl
+        )
+
+        val db = FirebaseFirestore.getInstance()
+        val driverRef = db.collection("drivers").document(userId)
+
+        driverRef.set(driver).addOnSuccessListener {
+            Toast.makeText(this, "Registro de conductor exitoso", Toast.LENGTH_SHORT).show()
+            val intent = Intent(this, RegisterDriverActivity::class.java)
+            intent.putExtra("USER_ID", userId)
+            Toast.makeText(this, "$userId", Toast.LENGTH_SHORT).show()
+            startActivity(intent)
+            finish()
+        }.addOnFailureListener { e ->
+            Toast.makeText(
+                this,
+                "Error al guardar datos del conductor: ${e.message}",
+                Toast.LENGTH_SHORT
+            ).show()
         }
     }
 }
