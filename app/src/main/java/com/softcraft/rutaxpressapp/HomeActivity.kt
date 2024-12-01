@@ -27,10 +27,10 @@ class HomeActivity : AppCompatActivity() {
         // Inicializar botones
         val driverButton: Button = findViewById(R.id.driverButton)
         val passengerButton: Button = findViewById(R.id.passengerButton)
-        val loginButton: Button = findViewById(R.id.loginButton)
-        val registerButton: Button = findViewById(R.id.registerButton)
+//        val loginButton: Button = findViewById(R.id.loginButton)
+//        val registerButton: Button = findViewById(R.id.registerButton)
 
-        // Configurar listeners
+//         Configurar listeners
         driverButton.setOnClickListener {
             navigateToRegisterActivity("Conductor")
         }
@@ -39,20 +39,18 @@ class HomeActivity : AppCompatActivity() {
             navigateToRegisterActivity("Pasajero")
         }
 
-        loginButton.setOnClickListener {
-            navigateToLoginActivity()
-        }
-
-        registerButton.setOnClickListener {
-            navigateToRegisterActivity(null)
-        }
+//        loginButton.setOnClickListener {
+//            navigateToLoginActivity()
+//        }
+//
+//        registerButton.setOnClickListener {
+//            navigateToRegisterActivity(null)
+//        }
     }
 
     private fun navigateToRegisterActivity(role: String?) {
         val intent = Intent(this, RegisterActivity::class.java)
-        role?.let {
-            intent.putExtra("USER_ROLE", it) // Enviar rol como extra
-        }
+        intent.putExtra("USER_ROLE", role)
         startActivity(intent)
     }
 
