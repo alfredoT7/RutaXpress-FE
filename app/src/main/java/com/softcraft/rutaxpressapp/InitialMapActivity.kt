@@ -332,6 +332,7 @@ class InitialMapActivity : AppCompatActivity(), OnMapReadyCallback,
                 map.addMarker(MarkerOptions().position(selectedLocation).title("Desde donde vas"))
             UserRepository.userFromLocation = selectedLocation
             tvDesdeDondeVas.text = getPlaceWithCoordenate(UserRepository.userFromLocation!!)
+            tvDesdeDondeVas.setTypeface(null, android.graphics.Typeface.BOLD)
         } else if (requestCode == REQUEST_CODE_SEARCH_TO) {
             toLocation = selectedLocation
             toMarker?.remove()
@@ -339,6 +340,7 @@ class InitialMapActivity : AppCompatActivity(), OnMapReadyCallback,
                 map.addMarker(MarkerOptions().position(selectedLocation).title("A donde vas"))
             UserRepository.userToLocation = selectedLocation
             tvADondeVas.text = getPlaceWithCoordenate(UserRepository.userToLocation!!)
+            tvADondeVas.setTypeface(null,android.graphics.Typeface.BOLD)
         }
     }
 
@@ -561,6 +563,10 @@ class InitialMapActivity : AppCompatActivity(), OnMapReadyCallback,
                     UserRepository.userFromLocation=userLocation
                     val lugar = getPlaceWithCoordenate(userLocation)
                     tvDesdeDondeVas.text = lugar
+                    tvDesdeDondeVas.setTypeface(null, android.graphics.Typeface.BOLD)
+                    runOnUiThread {
+                        Toast.makeText(this@InitialMapActivity,"Se selecciono tu ubicación actual", Toast.LENGTH_SHORT).show()
+                    }
                 }else{
                     tvDesdeDondeVas.text = "Ubicacion no disponible"
                 }
