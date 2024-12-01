@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">RutaXpressApp</string>
+    <string name="app_name">RutaXpress</string>
     <string name="login_tittle">Bienvenido!</string>
     <string name="register">Regístrate</string>
     <string name="name">Nombre</string>
