@@ -37,7 +37,6 @@ class RegisterDriverActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_register_driver)
 
-        // Verificar si el Intent contiene el userId
         userId = intent.getStringExtra("userId") ?: ""
         if (userId.isEmpty()) {
             Log.e(TAG, "User ID is missing")
@@ -48,23 +47,23 @@ class RegisterDriverActivity : AppCompatActivity() {
 
         Log.d(TAG, "User ID: $userId")
 
-        initCloudinary()
+        //initCloudinary()
         initComponents()
         initListeners()
     }
 
-    private fun initCloudinary() {
-        try {
-            MediaManager.get()
-        } catch (e: IllegalStateException) {
-            val config = mapOf(
-                "cloud_name" to "djcfm4nd2",
-                "api_key" to "897657815927312",
-                "api_secret" to "6Af5mOu8kiKfn9MT-P3Ag6vXF1s"
-            )
-            MediaManager.init(this, config)
-        }
-    }
+//    private fun initCloudinary() {
+//        try {
+//            MediaManager.get()
+//        } catch (e: IllegalStateException) {
+//            val config = mapOf(
+//                "cloud_name" to "djcfm4nd2",
+//                "api_key" to "897657815927312",
+//                "api_secret" to "6Af5mOu8kiKfn9MT-P3Ag6vXF1s"
+//            )
+//            MediaManager.init(this, config)
+//        }
+//    }
 
     private fun initComponents() {
         cvCarnetDeIdentidad = findViewById(R.id.cvCarnetDeIdentidad)
