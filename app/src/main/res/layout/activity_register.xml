@@ -73,7 +73,8 @@
                 android:padding="10dp"
                 android:background="@android:color/transparent"
                 android:maxLines="1"
-                android:singleLine="true" />
+                android:singleLine="true"
+                style="@style/hintColor"/>
         </androidx.cardview.widget.CardView>
 
         <androidx.cardview.widget.CardView
@@ -94,7 +95,8 @@
                 android:padding="10dp"
                 android:background="@android:color/transparent"
                 android:maxLines="1"
-                android:singleLine="true" />
+                android:singleLine="true"
+                style="@style/hintColor"/>
         </androidx.cardview.widget.CardView>
 
     </LinearLayout>
@@ -116,7 +118,8 @@
             android:padding="10dp"
             android:background="@android:color/transparent"
             android:maxLines="1"
-            android:singleLine="true" />
+            android:singleLine="true"
+            style="@style/hintColor"/>
     </androidx.cardview.widget.CardView>
     <androidx.cardview.widget.CardView
         android:layout_height="wrap_content"
@@ -136,7 +139,7 @@
             android:background="@android:color/transparent"
             android:maxLines="1"
             android:singleLine="true"
-            />
+            style="@style/hintColor"/>
     </androidx.cardview.widget.CardView>
     <androidx.cardview.widget.CardView
         android:layout_height="wrap_content"
@@ -156,7 +159,7 @@
             android:background="@android:color/transparent"
             android:maxLines="1"
             android:singleLine="true"
-            />
+            style="@style/hintColor"/>
     </androidx.cardview.widget.CardView>
     <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
@@ -170,6 +173,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:passwordToggleEnabled="true"
+            style="@style/hintColor"
             >
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/etPassword"
@@ -178,7 +182,7 @@
                 android:hint="Contraseña"
                 android:inputType="textPassword"
                 android:background="@color/cv_bg_color"
-                />
+                style="@style/hintColor"/>
         </com.google.android.material.textfield.TextInputLayout>
     </androidx.cardview.widget.CardView>
 
@@ -194,7 +198,8 @@
         <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:passwordToggleEnabled="true">
+            app:passwordToggleEnabled="true"
+            style="@style/hintColor">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/etConfirmPassword"
@@ -202,7 +207,8 @@
                 android:layout_height="wrap_content"
                 android:hint="Confirmar Contraseña"
                 android:inputType="textPassword"
-                android:background="@color/cv_bg_color" />
+                android:background="@color/cv_bg_color"
+                style="@style/hintColor"/>
         </com.google.android.material.textfield.TextInputLayout>
     </androidx.cardview.widget.CardView>
 
