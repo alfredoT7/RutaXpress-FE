@@ -18,7 +18,6 @@
         style="@style/appSubtitle"
         android:layout_marginTop="30dp"
         android:gravity="center"
-        android:textColor="@color/black"
         />
 
     <LinearLayout

@@ -19,6 +19,6 @@
     </style>
     <style name="hintColor">
         <item name="android:textColor">@color/black</item>
-        <item name="android:textColorHint">@color/black</item>
+        <item name="android:textColorHint">@color/teal_200</item>
     </style>
 </resources>
