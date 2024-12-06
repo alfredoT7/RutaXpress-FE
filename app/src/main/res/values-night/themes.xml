@@ -25,4 +25,8 @@
         <item name="cardBackgroundColor">@color/teal_200</item>
         <item name="android:textColorPrimary">@color/black</item>
     </style>
+    <style name="cvMap">
+        <item name="cardBackgroundColor">@color/teal_200</item>
+        <item name="android:textColorPrimary">@color/black</item>
+    </style>
 </resources>

@@ -27,4 +27,8 @@
         <item name="cardBackgroundColor">@color/grayCard</item>
         <item name="android:textColorPrimary">@color/black</item>
     </style>
+    <style name="cvMap">
+        <item name="cardBackgroundColor">@color/cv_bg_color</item>
+        <item name="android:textColorPrimary">@color/black</item>
+    </style>
 </resources>
