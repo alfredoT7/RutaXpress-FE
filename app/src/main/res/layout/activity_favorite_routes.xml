@@ -34,12 +34,12 @@
                 android:id="@+id/etSearchId"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:background="@android:color/transparent"
+                style="@style/hintColor"
                 android:hint="@string/search_btn_text_filter_routes"
                 android:maxLines="1"
                 android:singleLine="true"
                 android:imeOptions="actionSearch"
-                >
+                android:textSize="14dp">
 
             </EditText>
         </LinearLayout>
@@ -56,6 +56,8 @@
         android:id="@+id/rvLineas"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"/>
+        android:layout_marginTop="8dp"
+        style="@style/linear"
+        />
 
 </LinearLayout>
