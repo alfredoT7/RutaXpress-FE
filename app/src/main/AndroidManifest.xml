@@ -16,17 +16,19 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.RutaXpressApp"
         tools:targetApi="31">
-
+        <activity
+            android:name=".RoleActivity"
+            android:exported="false" />
         <!-- Configurar HomeActivity como actividad de inicio -->
         <activity
             android:name=".HomeActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
         <activity
             android:name=".FavoriteRoutesActivity"
             android:exported="false" />
@@ -38,20 +40,15 @@
             android:exported="false" />
         <activity
             android:name=".LineasFilterActivity"
-            android:exported="false" />
-
-        <!-- Meta-data para Google Maps API -->
+            android:exported="false" /> <!-- Meta-data para Google Maps API -->
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="@string/google_maps_key" />
-
-        <!-- LoginActivity sin intent-filter -->
+            android:value="@string/google_maps_key" /> <!-- LoginActivity sin intent-filter -->
         <activity
             android:name=".LoginActivity"
-            android:exported="true" />
-
-        <!-- Actividades adicionales -->
+            android:exported="true" /> <!-- Actividades adicionales -->
         <activity android:name=".InitialMapActivity" />
         <activity android:name=".SearchActivity" />
     </application>
+
 </manifest>

@@ -4,39 +4,34 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
+import android.widget.CheckBox
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 
 class HomeActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // Verificar si el usuario está logeado al abrir la app
         val sharedPref = getSharedPreferences("UserPrefs", Context.MODE_PRIVATE)
         val isLoggedIn = sharedPref.getBoolean("isLoggedIn", false)
 
         if (isLoggedIn) {
-            // Si está logeado, navegar a
             val intent = Intent(this, InitialMapActivity::class.java)
             startActivity(intent)
-            finish() // Finalizar HomeActivity para evitar volver aquí con el botón "Atrás"
+            finish()
             return
         }
 
         setContentView(R.layout.activity_home)
 
-        // Inicializar botones
-        val driverButton: Button = findViewById(R.id.driverButton)
-        val passengerButton: Button = findViewById(R.id.passengerButton)
+        // Inicializar botones y CheckBox
         val loginButton: Button = findViewById(R.id.loginButton)
         val registerButton: Button = findViewById(R.id.registerButton)
+        val acceptPoliciesCheckBox: CheckBox = findViewById(R.id.acceptPoliciesCheckBox)
 
-        // Configurar listeners
-        driverButton.setOnClickListener {
-            navigateToRegisterActivity("Conductor")
-        }
-
-        passengerButton.setOnClickListener {
-            navigateToRegisterActivity("Pasajero")
+        // Listener para el CheckBox
+        acceptPoliciesCheckBox.setOnCheckedChangeListener { _, isChecked ->
+            registerButton.isEnabled = isChecked
         }
 
         loginButton.setOnClickListener {
@@ -44,15 +39,16 @@ class HomeActivity : AppCompatActivity() {
         }
 
         registerButton.setOnClickListener {
-            navigateToRegisterActivity(null)
+            if (acceptPoliciesCheckBox.isChecked) {
+                navigateToRegisterActivity()
+            } else {
+                Toast.makeText(this, "Debes aceptar las políticas y condiciones.", Toast.LENGTH_SHORT).show()
+            }
         }
     }
 
-    private fun navigateToRegisterActivity(role: String?) {
+    private fun navigateToRegisterActivity() {
         val intent = Intent(this, RegisterActivity::class.java)
-        role?.let {
-            intent.putExtra("USER_ROLE", it) // Enviar rol como extra
-        }
         startActivity(intent)
     }
 
