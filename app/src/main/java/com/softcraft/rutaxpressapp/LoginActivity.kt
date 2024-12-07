@@ -8,7 +8,6 @@
     import android.widget.TextView
     import android.widget.Toast
     import androidx.appcompat.app.AppCompatActivity
-    import androidx.appcompat.app.AppCompatDelegate
     import com.google.android.material.textfield.TextInputEditText
     import com.google.firebase.auth.FirebaseAuth
     import com.google.firebase.auth.ktx.auth
@@ -36,7 +35,6 @@
 
         override fun onCreate(savedInstanceState: Bundle?) {
             super.onCreate(savedInstanceState)
-            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
             auth = Firebase.auth
             db = FirebaseFirestore.getInstance()  // Inicializar Firestore
 

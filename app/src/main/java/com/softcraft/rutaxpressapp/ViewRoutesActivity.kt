@@ -4,12 +4,10 @@ import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.os.Bundle
-import android.util.Log
 import android.widget.Button
 import android.widget.Switch
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.app.AppCompatDelegate
 import androidx.cardview.widget.CardView
 import androidx.core.content.ContextCompat
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -20,11 +18,9 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.CustomCap
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
-import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.gms.maps.model.Polyline
 import com.google.android.gms.maps.model.PolylineOptions
 import com.softcraft.rutaxpressapp.lineas.LineasRepository
-import com.softcraft.rutaxpressapp.routes.ApiService
 import com.softcraft.rutaxpressapp.routes.BackendRouteResponse
 import com.softcraft.rutaxpressapp.routes.FavoriteRequest
 import com.softcraft.rutaxpressapp.routes.RouteController
@@ -35,7 +31,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import retrofit2.create
+
 class ViewRoutesActivity : AppCompatActivity(), OnMapReadyCallback {
     private var routeId: String? = null
     private lateinit var map: GoogleMap
@@ -52,7 +48,6 @@ class ViewRoutesActivity : AppCompatActivity(), OnMapReadyCallback {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
         setContentView(R.layout.activity_view_routes)
         routeId = intent.getStringExtra("routeId")
         createFragment()
