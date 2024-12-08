@@ -10,15 +10,13 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="90dp"
-        android:padding="16dp"
-
-        >
+        android:padding="16dp">
 
         <TextView
             android:id="@+id/tvUserName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="My bombre"
+            android:text="My name"
             android:layout_below="@id/imgProfile"
             android:layout_marginTop="-3dp"
             />
@@ -88,9 +86,8 @@
             android:layout_marginEnd="20dp"
             android:layout_weight="1"
             app:cardElevation="0dp"
-            app:cardBackgroundColor="@color/cv_bg_color"
             app:cardCornerRadius="19dp"
-            >
+            style="@style/cvMap">
 
             <LinearLayout
                 android:layout_width="wrap_content"
@@ -121,10 +118,9 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            app:cardBackgroundColor="@color/cv_bg_color"
             app:cardCornerRadius="19dp"
             app:cardElevation="0dp"
-            >
+            style="@style/cvMap">
 
             <LinearLayout
                 android:layout_width="wrap_content"
@@ -173,13 +169,13 @@
             android:layout_weight="1"
             app:cardCornerRadius="18dp"
             android:layout_marginTop="10dp"
-            app:cardBackgroundColor="@color/cv_bg_color"
             android:layout_marginStart="20dp"
             android:layout_marginRight="8dp"
             android:layout_marginBottom="10dp"
             app:cardElevation="0dp"
-            >
+            style="@style/cvMap">
             <TextView
+                android:id="@+id/tvDesdeDondeVas"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
@@ -195,6 +191,7 @@
 
 
         <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btnSelectMyLocation"
             android:layout_width="0dp"
             android:layout_height="55dp"
             android:text="Seleccionar mi ubicación actual"
@@ -224,12 +221,12 @@
         android:layout_height="45dp"
         app:cardCornerRadius="18dp"
         android:layout_marginTop="10dp"
-        app:cardBackgroundColor="@color/cv_bg_color"
         android:layout_marginHorizontal="20dp"
         android:layout_marginBottom="10dp"
         app:cardElevation="0dp"
-        >
+        style="@style/cvMap">
         <TextView
+            android:id="@+id/tvADondeVas"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
@@ -246,6 +243,7 @@
         android:layout_height="wrap_content"
         >
         <Button
+            android:id="@+id/btnSearchTrufi"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/search_btn_text"

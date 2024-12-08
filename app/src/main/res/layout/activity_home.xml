@@ -2,56 +2,61 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="@drawable/fondo"
-    android:padding="16dp">
+    android:gravity="center"
+    android:background="@drawable/fondo">
 
     <ImageView
         android:id="@+id/appLogo"
-        android:layout_width="200dp"
-        android:layout_height="200dp"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginTop="48dp"
+        android:layout_width="300dp"
+        android:layout_height="300dp"
         android:contentDescription="App Logo"
-        android:src="@drawable/cambio" />
+        android:src="@drawable/cambio"
+        android:layout_marginBottom="24dp" />
 
     <TextView
-        android:id="@+id/policiesTextView"
+        android:id="@+id/titleTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginTop="16dp"
-        android:text="Al continuar, aceptas nuestras políticas y términos."
-        android:textSize="14sp"
+        android:text="Elige una opción"
+        android:textSize="24sp"
+        android:textStyle="bold"
         android:textColor="#FFFFFF"
-        android:textAlignment="center" />
+        android:layout_marginBottom="32dp" />
 
-    <CheckBox
-        android:id="@+id/acceptPoliciesCheckBox"
+    <Button
+        android:id="@+id/driverButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginTop="8dp"
-        android:text="Acepto las políticas de privacidad"
+        android:text="Ser Conductor"
+        android:backgroundTint="#3B82F6"
         android:textColor="#FFFFFF"
-        android:buttonTint="#FFFFFF" />
+        android:layout_marginBottom="16dp" />
 
     <Button
-        android:id="@+id/loginButton"
-        android:layout_width="match_parent"
+        android:id="@+id/passengerButton"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
-        android:backgroundTint="#4CAF50"
-        android:text="Iniciar Sesión"
-        android:textColor="#FFFFFF" />
-
-    <Button
-        android:id="@+id/registerButton"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:backgroundTint="#FFC107"
-        android:text="Registrarse"
+        android:text="Ser Pasajero"
+        android:backgroundTint="#F97316"
         android:textColor="#FFFFFF"
-        android:enabled="false" />
+        android:layout_marginBottom="16dp" />
+
+<!--    <Button-->
+<!--        android:id="@+id/loginButton"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:text="Iniciar Sesión"-->
+<!--        android:backgroundTint="#4CAF50"-->
+<!--        android:textColor="#FFFFFF"-->
+<!--        android:layout_marginBottom="16dp" />-->
+
+<!--    <Button-->
+<!--        android:id="@+id/registerButton"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:text="Registrarse"-->
+<!--        android:backgroundTint="#FFC107"-->
+<!--        android:textColor="#FFFFFF"-->
+<!--        android:layout_marginBottom="16dp" />-->
 
 </LinearLayout>

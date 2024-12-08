@@ -11,6 +11,26 @@
         <item name="colorOnSecondary">@color/black</item>
         <!-- Status bar color. -->
         <item name="android:statusBarColor">?attr/colorPrimaryVariant</item>
-        <!-- Customize your theme here. -->
+    </style>
+    <!-- Cambiaremos los colores para tema oscuro -->
+    <style name="appSubtitle">
+        <item name="android:textColor">@color/white</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+    <style name="hintColor">
+        <item name="android:textColor">@color/black</item>
+        <item name="android:textColorHint">@color/teal_200</item>
+    </style>
+    <style name="theCard">
+        <item name="cardBackgroundColor">@color/teal_200</item>
+        <item name="android:textColorPrimary">@color/black</item>
+    </style>
+    <style name="cvMap">
+        <item name="cardBackgroundColor">@color/teal_200</item>
+        <item name="android:textColorPrimary">@color/black</item>
+    </style>
+    <style name="linear">
+        <item name="android:background">@color/teal_200</item>
+        <item name="android:textColor">@color/cv_bg_color</item>
     </style>
 </resources>
