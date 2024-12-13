@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="com.softcraft.rutaxpressapp"
-    >
+    package="com.softcraft.rutaxpressapp">
 
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
@@ -20,9 +19,11 @@
         android:theme="@style/Theme.RutaXpressApp"
         tools:targetApi="31">
         <activity
-            android:name=".DriverView.RegisterDriverActivity"
+            android:name=".DriverView.InitialMapDriverActivity"
             android:exported="false" />
-        <!-- Configurar HomeActivity como actividad de inicio -->
+        <activity
+            android:name=".DriverView.RegisterDriverActivity"
+            android:exported="false" /> <!-- Configurar HomeActivity como actividad de inicio -->
         <activity
             android:name=".LoginActivity"
             android:exported="true">

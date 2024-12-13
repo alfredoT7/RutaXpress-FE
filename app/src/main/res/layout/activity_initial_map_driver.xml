@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".DriverView.InitialMapDriverActivity"
+    android:orientation="vertical"
+    >
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="90dp"
+        android:padding="16dp"
+
+        >
+        <TextView
+            android:id="@+id/tvUserName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="My bombre"
+            android:layout_below="@id/imgProfile"
+            android:layout_marginTop="-3dp"
+            />
+
+        <ImageView
+            android:id="@+id/imgProfile"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:background="@drawable/ic_circle"
+            android:scaleType="centerCrop"/>
+
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_centerInParent="true"
+            android:layout_marginStart="50dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/my_ubication"
+                android:layout_gravity="center" />
+
+            <TextView
+                android:id="@+id/tvCurrentPlace"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="17sp"
+                android:textStyle="bold"
+                tools:text="Cala Cala, calle los alamos"
+                android:layout_gravity="center" />
+        </LinearLayout>
+
+    </RelativeLayout>
+    <fragment
+        android:id="@+id/map"
+        android:name="com.google.android.gms.maps.SupportMapFragment"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_marginBottom="10dp"/>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="20dp"
+        android:layout_marginTop="10dp"
+        android:text="@string/driving_line"
+        android:textSize="18sp"
+        android:layout_marginVertical="0dp"
+        android:textStyle="bold" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="62dp"
+        android:layout_marginHorizontal="20dp"
+        android:layout_marginTop="8dp"
+        android:orientation="horizontal">
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/cvFavoriteRoutes"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="20dp"
+            android:layout_weight="1"
+            app:cardElevation="0dp"
+            app:cardBackgroundColor="@color/cv_bg_color"
+            app:cardCornerRadius="19dp"
+            >
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+                <ImageView
+                    android:layout_width="35dp"
+                    android:layout_height="35dp"
+                    android:layout_margin="10dp"
+                    android:src="@drawable/ic_steering_wheel"
+                    app:tint="@color/teal_700"
+                    >
+                </ImageView>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:text="@string/driver_profile">
+                </TextView>
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/cvBusLines"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            app:cardBackgroundColor="@color/cv_bg_color"
+            app:cardCornerRadius="19dp"
+            app:cardElevation="0dp"
+            >
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:layout_width="35dp"
+                    android:layout_height="35dp"
+                    android:layout_margin="10dp"
+                    android:src="@drawable/ic_bus_icon"
+                    app:tint="@color/app_orange"
+                    >
+                </ImageView>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:text="@string/bus_lines_driver">
+                </TextView>
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+    </LinearLayout>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="20dp"
+        android:layout_marginTop="10dp"
+        android:text="Linea: 233-b"
+        android:textSize="16sp"
+        android:layout_marginVertical="0dp"
+        android:textStyle="bold"
+        >
+    </TextView>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="20dp"
+        android:layout_marginTop="10dp"
+        android:text="Ruta: Cala Cala - Los alamos - El castillo"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:layout_marginVertical="0dp"
+        >
+    </TextView>
+    <androidx.cardview.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        >
+        <Button
+            android:id="@+id/btnSearchTrufi"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/start_route"
+            android:backgroundTint="@color/btnColor"
+            android:textColor="@android:color/white"
+            android:layout_marginHorizontal="20dp"
+            android:layout_marginBottom="10dp"
+            android:layout_marginTop="10dp"
+            >
+        </Button>
+    </androidx.cardview.widget.CardView>
+
+</LinearLayout>
