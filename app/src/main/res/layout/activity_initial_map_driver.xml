@@ -18,7 +18,7 @@
             android:id="@+id/tvUserName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="My bombre"
+            android:text="My nombre"
             android:layout_below="@id/imgProfile"
             android:layout_marginTop="-3dp"
             />
@@ -173,7 +173,7 @@
         android:layout_height="wrap_content"
         >
         <Button
-            android:id="@+id/btnSearchTrufi"
+            android:id="@+id/btnStartRoute"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/start_route"
