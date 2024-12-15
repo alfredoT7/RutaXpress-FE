@@ -1,4 +1,4 @@
-package com.softcraft.rutaxpressapp.DriverView
+package com.softcraft.rutaxpressapp.driverView
 
 import android.app.AlertDialog
 import android.content.Intent
@@ -89,7 +89,8 @@ class RegisterDriverActivity : AppCompatActivity() {
 
         }
         btnFinishRegister.setOnClickListener {
-
+            val intent = Intent(this, InitialMapDriverActivity::class.java)
+            startActivity(intent)
         }
     }
 
