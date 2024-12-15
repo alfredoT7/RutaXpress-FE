@@ -96,7 +96,7 @@
                 android:layout_gravity="center" />
         </androidx.cardview.widget.CardView>
         <androidx.cardview.widget.CardView
-            android:id="@+id/cvSoat"
+            android:id="@+id/cvTransportLine"
             android:layout_width="match_parent"
             android:layout_height="70dp"
             android:backgroundTint="#4B073B4C"
@@ -111,7 +111,7 @@
                 android:textSize="20sp"
                 android:textColor="#000000"
                 android:textStyle="bold"
-                android:text="SOAT"
+                android:text="Linea de transporte"
                 android:layout_gravity="center" />
         </androidx.cardview.widget.CardView>
         <ImageView
