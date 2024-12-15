@@ -1,4 +1,4 @@
-package com.softcraft.rutaxpressapp.driverView
+package com.softcraft.rutaxpressapp.viewsDriver
 
 import android.Manifest
 import android.content.pm.PackageManager
