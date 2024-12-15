@@ -1,24 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:tools="http://schemas.android.com/tools"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    tools:context=".InitialMapActivity"
-    android:orientation="vertical">
-
+    tools:context=".driverView.InitialMapDriverActivity"
+    android:orientation="vertical"
+    >
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="90dp"
         android:padding="16dp"
 
         >
-
         <TextView
             android:id="@+id/tvUserName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="My bombre"
+            android:text="My nombre"
             android:layout_below="@id/imgProfile"
             android:layout_marginTop="-3dp"
             />
@@ -69,7 +69,7 @@
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="20dp"
         android:layout_marginTop="10dp"
-        android:text="@string/options_to_find_the_route"
+        android:text="@string/driving_line"
         android:textSize="18sp"
         android:layout_marginVertical="0dp"
         android:textStyle="bold" />
@@ -96,22 +96,19 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal">
-
                 <ImageView
                     android:layout_width="35dp"
                     android:layout_height="35dp"
                     android:layout_margin="10dp"
-                    android:src="@drawable/ic_favorite_marquer"
-                    app:tint="@color/favorite_yellow"
+                    android:src="@drawable/ic_steering_wheel"
+                    app:tint="@color/teal_700"
                     >
-
                 </ImageView>
-
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
-                    android:text="@string/favorite_routes">
+                    android:text="@string/driver_profile">
                 </TextView>
             </LinearLayout>
         </androidx.cardview.widget.CardView>
@@ -144,7 +141,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
-                    android:text="@string/bus_lines">
+                    android:text="@string/bus_lines_driver">
                 </TextView>
             </LinearLayout>
         </androidx.cardview.widget.CardView>
@@ -154,105 +151,32 @@
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="20dp"
         android:layout_marginTop="10dp"
-        android:text="@string/search_box_from"
+        android:text="Linea: 233-b"
         android:textSize="16sp"
         android:layout_marginVertical="0dp"
         android:textStyle="bold"
         >
     </TextView>
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_marginEnd="20dp"
-        >
-        <androidx.cardview.widget.CardView
-            android:id="@+id/cvWhereYouGoFrom"
-            android:layout_width="0dp"
-            android:layout_height="45dp"
-            android:layout_weight="1"
-            app:cardCornerRadius="18dp"
-            android:layout_marginTop="10dp"
-            app:cardBackgroundColor="@color/cv_bg_color"
-            android:layout_marginStart="20dp"
-            android:layout_marginRight="8dp"
-            android:layout_marginBottom="10dp"
-            app:cardElevation="0dp"
-            >
-            <TextView
-                android:id="@+id/tvDesdeDondeVas"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:paddingHorizontal="30dp"
-                android:textSize="15sp"
-                android:hint="Escribe o elige tu ubicación en el mapa"
-                android:maxLines="1"
-                android:singleLine="true"
-                >
-
-            </TextView>
-        </androidx.cardview.widget.CardView>
-
-
-        <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/btnSelectMyLocation"
-            android:layout_width="0dp"
-            android:layout_height="55dp"
-            android:text="Seleccionar mi ubicación actual"
-            android:textSize="13sp"
-            android:layout_weight="0.6"
-            android:layout_gravity="center"
-            android:textAllCaps="false"
-            android:backgroundTint="@color/teal_700"
-            android:textColor="@android:color/white"
-            >
-        </androidx.appcompat.widget.AppCompatButton>
-    </LinearLayout>
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="20dp"
         android:layout_marginTop="10dp"
-        android:text="¿A donde vas?"
+        android:text="Ruta: Cala Cala - Los alamos - El castillo"
         android:textSize="16sp"
         android:textStyle="bold"
         android:layout_marginVertical="0dp"
         >
     </TextView>
     <androidx.cardview.widget.CardView
-        android:id="@+id/cvWhereYouGoTo"
-        android:layout_width="match_parent"
-        android:layout_height="45dp"
-        app:cardCornerRadius="18dp"
-        android:layout_marginTop="10dp"
-        app:cardBackgroundColor="@color/cv_bg_color"
-        android:layout_marginHorizontal="20dp"
-        android:layout_marginBottom="10dp"
-        app:cardElevation="0dp"
-        >
-        <TextView
-            android:id="@+id/tvADondeVas"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:paddingHorizontal="30dp"
-            android:textSize="15sp"
-            android:hint="Escribe o elige tu ubicación en el mapa"
-            android:maxLines="1"
-            android:singleLine="true"
-            >
-        </TextView>
-    </androidx.cardview.widget.CardView>
-    <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         >
         <Button
-            android:id="@+id/btnSearchTrufi"
+            android:id="@+id/btnStartRoute"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/search_btn_text"
+            android:text="@string/start_route"
             android:backgroundTint="@color/btnColor"
             android:textColor="@android:color/white"
             android:layout_marginHorizontal="20dp"
@@ -261,4 +185,5 @@
             >
         </Button>
     </androidx.cardview.widget.CardView>
+
 </LinearLayout>

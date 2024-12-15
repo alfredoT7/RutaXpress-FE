@@ -35,4 +35,8 @@
     <string name="favorites_lines">Tus lineas favoritas</string>
     <string name="contrase_a">Contraseña</string>
     <string name="validations">Validaciones Extra</string>
+    <string name="driving_line">Linea actual:</string>
+    <string name="start_route">Iniciar ruta</string>
+    <string name="bus_lines_driver">Mis lineas</string>
+    <string name="driver_profile">Mi perfil conductor</string>
 </resources>
