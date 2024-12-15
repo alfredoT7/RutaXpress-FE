@@ -8,6 +8,7 @@ import android.content.pm.PackageManager
 import android.location.Address
 import android.location.Geocoder
 import android.os.Bundle
+import android.widget.ImageView
 import android.view.View
 import android.widget.PopupMenu
 import android.widget.TextView
@@ -15,13 +16,15 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import com.bumptech.glide.Glide
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
-import com.softcraft.rutaxpressapp.LoginActivity
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 import com.softcraft.rutaxpressapp.R
 import java.io.IOException
 import java.util.Locale
@@ -29,12 +32,42 @@ import java.util.Locale
 class InitialDriverActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var map: GoogleMap
     private lateinit var tvCurrentPlace: TextView
+    private lateinit var tvUserName: TextView
+    private lateinit var imgProfile: ImageView
+    private lateinit var db: FirebaseFirestore
+    private lateinit var auth: FirebaseAuth
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_initial_driver)
         tvCurrentPlace = findViewById(R.id.tvCurrentPlace)
+        tvUserName = findViewById(R.id.tvUserName)
+        imgProfile = findViewById(R.id.imgProfile)
+        db = FirebaseFirestore.getInstance()
+        auth = FirebaseAuth.getInstance()
+        loadUserProfile()
         createFragment()
+    }
+
+    private fun loadUserProfile() {
+        val userId = auth.currentUser?.uid ?: return
+        db.collection("users").document(userId)
+            .get()
+            .addOnSuccessListener { document ->
+                if (document != null) {
+                    val username = document.getString("username") ?: ""
+                    val profileImageUrl = document.getString("profileImageUrl") ?: ""
+                    tvUserName.text = username
+                    if (profileImageUrl.isNotEmpty()) {
+                        Glide.with(this).load(profileImageUrl)
+                            .circleCrop()
+                            .into(imgProfile)
+                    }
+                }
+            }
+            .addOnFailureListener { exception ->
+                Toast.makeText(this, "Error al cargar datos: ${exception.message}", Toast.LENGTH_SHORT).show()
+            }
     }
 
     private fun createFragment() {
@@ -75,7 +108,8 @@ class InitialDriverActivity : AppCompatActivity(), OnMapReadyCallback {
             if (addresses!!.isNotEmpty()) {
                 val address: Address = addresses[0]
                 val addressText: String = address.getAddressLine(0)
-                tvCurrentPlace.text = addressText
+                val shortAddress = addressText.split(",")[0]
+                tvCurrentPlace.text = shortAddress
             } else {
                 tvCurrentPlace.text = "Dirección no disponible"
             }
