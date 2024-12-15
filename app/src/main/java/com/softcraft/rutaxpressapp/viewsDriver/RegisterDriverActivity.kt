@@ -69,7 +69,9 @@ class RegisterDriverActivity : AppCompatActivity() {
             showCameraLabelDialog("Saca foto de la parte frontal de tu licencia de conducir", REQUEST_IMAGE_CAPTURE_3)
         }
         cvDataVehicle.setOnClickListener {
-
+            val intent = Intent(this@RegisterDriverActivity, VehicleFormActivity::class.java)
+            intent.putExtra("userId", userId)
+            startActivity(intent)
         }
         cvTransportLine.setOnClickListener {
 

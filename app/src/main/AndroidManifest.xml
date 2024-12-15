@@ -19,9 +19,11 @@
         android:theme="@style/Theme.RutaXpressApp"
         tools:targetApi="31">
         <activity
+            android:name=".viewsDriver.VehicleFormActivity"
+            android:exported="false" />
+        <activity
             android:name=".viewsDriver.InitialDriverActivity"
             android:exported="false" />
-
         <activity
             android:name=".viewsDriver.RegisterDriverActivity"
             android:exported="false" /> <!-- Configurar HomeActivity como actividad de inicio -->
@@ -30,7 +32,6 @@
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>

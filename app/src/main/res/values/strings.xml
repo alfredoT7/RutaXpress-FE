@@ -39,4 +39,8 @@
     <string name="start_route">Iniciar ruta</string>
     <string name="bus_lines_driver">Mis lineas</string>
     <string name="driver_profile">Mi perfil conductor</string>
+    <string name="car_register">Registro del coche</string>
+    <string name="make">Marca</string>
+    <string name="model">Modelo</string>
+
 </resources>
