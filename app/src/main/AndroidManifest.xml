@@ -21,9 +21,7 @@
         <activity
             android:name=".driverView.InitialDriverActivity"
             android:exported="false" />
-        <activity
-            android:name=".driverView.InitialMapDriverActivity"
-            android:exported="false" />
+
         <activity
             android:name=".driverView.RegisterDriverActivity"
             android:exported="false" /> <!-- Configurar HomeActivity como actividad de inicio -->
