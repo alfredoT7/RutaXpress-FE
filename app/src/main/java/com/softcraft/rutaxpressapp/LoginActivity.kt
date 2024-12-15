@@ -40,9 +40,19 @@
             auth = Firebase.auth
             db = FirebaseFirestore.getInstance()  // Inicializar Firestore
 
-            setContentView(R.layout.activity_login)
-            initComponents()
-            initListeners()
+            if (isUserLoggedIn()) {
+                loadUserDataAndNavigate()
+            } else {
+                setContentView(R.layout.activity_login)
+                initComponents()
+                initListeners()
+
+            }
+        }
+
+        private fun isUserLoggedIn(): Boolean {
+            val sharedPref = getSharedPreferences("UserPrefs", Context.MODE_PRIVATE)
+            return sharedPref.getString("userId", null) != null
         }
 
         private fun initComponents() {
@@ -76,6 +86,12 @@
             auth.signInWithEmailAndPassword(email, password)
                 .addOnCompleteListener(this) { task ->
                     if (task.isSuccessful) {
+                        val userId = auth.currentUser?.uid ?: ""
+                        val token = auth.currentUser?.getIdToken(false)?.result?.token ?: ""
+
+                        saveUserId(userId)
+                        saveToken(token)
+
                         Log.d("LoginActivity", "Login con éxito: ${auth.currentUser?.email}")
                         loadUserDataAndNavigate()
                     } else {
@@ -83,6 +99,14 @@
                         Toast.makeText(this, "Error de autenticación: ${task.exception?.message}", Toast.LENGTH_SHORT).show()
                     }
                 }
+        }
+
+        private fun saveToken(token: String) {
+            val sharedPref = getSharedPreferences("UserPrefs", Context.MODE_PRIVATE)
+            with(sharedPref.edit()) {
+                putString("token", token)
+                apply()
+            }
         }
 
         private fun loadUserDataAndNavigate() {
