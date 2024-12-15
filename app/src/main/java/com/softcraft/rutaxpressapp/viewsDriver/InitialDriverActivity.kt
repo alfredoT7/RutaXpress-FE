@@ -1,11 +1,16 @@
 package com.softcraft.rutaxpressapp.viewsDriver
 
 import android.Manifest
+import android.app.AlertDialog
+import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.Address
 import android.location.Geocoder
 import android.os.Bundle
 import android.widget.ImageView
+import android.view.View
+import android.widget.PopupMenu
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -157,5 +162,58 @@ class InitialDriverActivity : AppCompatActivity(), OnMapReadyCallback {
 
     companion object {
         private const val REQUEST_CODE_LOCATION = 0
+    }
+
+    fun openProfileMenu(view: View){
+        val popupMenu = PopupMenu(this, view)
+        popupMenu.menuInflater.inflate(R.menu.profile_menu, popupMenu.menu)
+        popupMenu.setOnMenuItemClickListener { menuItem ->
+            when(menuItem.itemId){
+                R.id.action_view_profile -> {
+                    showUserProfile()
+                    true
+                }
+                R.id.action_settings -> {
+                    openSettings()
+                    true
+                }
+                R.id.action_logout -> {
+                    logoutUser()
+                    true
+                }
+                else -> false
+            }
+        }
+        popupMenu.show()
+    }
+
+
+    private fun logoutUser() {
+        val shardedPref = getSharedPreferences("UserPrefs", Context.MODE_PRIVATE)
+        with(shardedPref.edit()){
+            clear()
+            apply()
+        }
+
+        val intent = Intent(this, LoginActivity::class.java)
+        startActivity(intent)
+        finish()
+    }
+
+    private fun openSettings() {
+        Toast.makeText(this, "Configuraciones no implementadas aún", Toast.LENGTH_SHORT).show()
+    }
+
+
+    private fun showUserProfile() {
+        val sharedPref = getSharedPreferences("UserPrefs", Context.MODE_PRIVATE)
+        val userName = sharedPref.getString("userName", "Usuario")
+        val useEmail = sharedPref.getString("userEmail", "Correo no disponible")
+
+        AlertDialog.Builder(this)
+            .setTitle("Perfil de usuario")
+            .setMessage("Nombre: $userName\nCorreo: $useEmail")
+            .setPositiveButton("Cerrar") { dialog, _ -> dialog.dismiss()}
+            .show()
     }
 }
