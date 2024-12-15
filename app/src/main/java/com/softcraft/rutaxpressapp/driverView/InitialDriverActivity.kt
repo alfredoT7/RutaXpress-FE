@@ -26,7 +26,7 @@ class InitialDriverActivity : AppCompatActivity(), OnMapReadyCallback {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_initial_map_driver)
+        setContentView(R.layout.activity_initial_driver)
         tvCurrentPlace = findViewById(R.id.tvCurrentPlace)
         createFragment()
     }
