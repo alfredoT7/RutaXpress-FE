@@ -19,7 +19,7 @@ import com.cloudinary.android.callback.ErrorInfo
 import com.cloudinary.android.callback.UploadCallback
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
-import com.softcraft.rutaxpressapp.DriverView.RegisterDriverActivity
+import com.softcraft.rutaxpressapp.driverView.RegisterDriverActivity
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await

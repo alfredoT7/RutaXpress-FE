@@ -16,7 +16,7 @@
         android:orientation="horizontal"
         android:paddingVertical="8dp"
         android:paddingHorizontal="20dp"
-        style="@style/linear"
+
         >
 
         <TextView

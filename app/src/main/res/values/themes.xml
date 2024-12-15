@@ -16,23 +16,7 @@
 
     </style>
     <style name="appSubtitle">
-        <item name="android:textColor">@color/black</item>
+        <item name="android:textColor">#000000</item>
         <item name="android:textStyle">bold</item>
-    </style>
-    <style name="hintColor">
-        <item name="android:textColor">@color/black</item>
-        <item name="android:textColorHint">@color/btnColor</item>
-    </style>
-    <style name="theCard">
-        <item name="cardBackgroundColor">@color/grayCard</item>
-        <item name="android:textColorPrimary">@color/black</item>
-    </style>
-    <style name="cvMap">
-        <item name="cardBackgroundColor">@color/cv_bg_color</item>
-        <item name="android:textColorPrimary">@color/black</item>
-    </style>
-    <style name="linear">
-        <item name="android:background">@color/cv_bg_color</item>
-        <item name="android:textColor">@color/black</item>
     </style>
 </resources>

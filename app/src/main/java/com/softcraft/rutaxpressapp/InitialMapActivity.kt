@@ -225,7 +225,7 @@ class InitialMapActivity : AppCompatActivity(), OnMapReadyCallback,
                 }
             }
         } else {
-            Toast.makeText(this, "Por favor, complete ambos puntos para trazar la ruta", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "una de las coordenadas falta", Toast.LENGTH_SHORT).show()
         }
     }
 

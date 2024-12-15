@@ -5,7 +5,7 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".DriverView.RegisterDriverActivity">
+    tools:context=".driverView.RegisterDriverActivity">
     <LinearLayout
 
         android:layout_width="match_parent"
@@ -42,11 +42,12 @@
             android:id="@+id/cvCarnetDeIdentidad"
             android:layout_width="match_parent"
             android:layout_height="70dp"
+            android:backgroundTint="#4B073B4C"
             android:layout_marginHorizontal="10dp"
             app:cardCornerRadius="13dp"
             app:cardElevation="0dp"
             android:layout_marginBottom="10dp"
-            style="@style/theCard">
+            >
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -54,18 +55,17 @@
                 android:textStyle="bold"
                 android:textColor="#000000"
                 android:text="Carnet de Identidad"
-                android:layout_gravity="center"
-                style="@style/appSubtitle"/>
+                android:layout_gravity="center" />
         </androidx.cardview.widget.CardView>
         <androidx.cardview.widget.CardView
             android:id="@+id/cvDriverLicense"
             android:layout_width="match_parent"
             android:layout_height="70dp"
+            android:backgroundTint="#4B073B4C"
             android:layout_marginHorizontal="10dp"
             app:cardCornerRadius="13dp"
             app:cardElevation="0dp"
             android:layout_marginBottom="10dp"
-            style="@style/theCard"
             >
             <TextView
                 android:layout_width="wrap_content"
@@ -74,18 +74,18 @@
                 android:textColor="#000000"
                 android:textStyle="bold"
                 android:text="Licencia de conducir"
-                android:layout_gravity="center"
-                />
+                android:layout_gravity="center" />
         </androidx.cardview.widget.CardView>
         <androidx.cardview.widget.CardView
             android:id="@+id/cvDataVehicle"
             android:layout_width="match_parent"
             android:layout_height="70dp"
+            android:backgroundTint="#4B073B4C"
             android:layout_marginHorizontal="10dp"
             app:cardCornerRadius="13dp"
             app:cardElevation="0dp"
             android:layout_marginBottom="10dp"
-            style="@style/theCard">
+            >
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -96,21 +96,22 @@
                 android:layout_gravity="center" />
         </androidx.cardview.widget.CardView>
         <androidx.cardview.widget.CardView
-            android:id="@+id/cvSoat"
+            android:id="@+id/cvTransportLine"
             android:layout_width="match_parent"
             android:layout_height="70dp"
+            android:backgroundTint="#4B073B4C"
             android:layout_marginHorizontal="10dp"
             app:cardCornerRadius="13dp"
             app:cardElevation="0dp"
             android:layout_marginBottom="10dp"
-            style="@style/theCard">
+            >
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="20sp"
                 android:textColor="#000000"
                 android:textStyle="bold"
-                android:text="SOAT"
+                android:text="Linea de transporte"
                 android:layout_gravity="center" />
         </androidx.cardview.widget.CardView>
         <ImageView
