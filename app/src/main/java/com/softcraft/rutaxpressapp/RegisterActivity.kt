@@ -343,6 +343,7 @@ class RegisterActivity : AppCompatActivity() {
         driverRef.set(driver).addOnSuccessListener {
             Toast.makeText(this, "Registro de conductor exitoso", Toast.LENGTH_SHORT).show()
             val intent = Intent(this, RegisterDriverActivity::class.java)
+
             intent.putExtra("userId", userId)
             Toast.makeText(this, "$userId", Toast.LENGTH_SHORT).show()
             startActivity(intent)
