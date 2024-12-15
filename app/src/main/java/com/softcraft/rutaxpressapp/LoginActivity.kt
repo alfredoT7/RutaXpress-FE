@@ -15,6 +15,7 @@
     import com.google.firebase.firestore.FirebaseFirestore
     import com.google.firebase.ktx.Firebase
     import com.softcraft.rutaxpressapp.user.UserRepository
+    import com.softcraft.rutaxpressapp.viewsDriver.InitialDriverActivity
 
     data class UserProfile(
         val username: String = "",
@@ -22,7 +23,8 @@
         val email: String = "",
         val phone: String = "",
         val birthDate: String = "",
-        val profileImageUrl: String? = null
+        val profileImageUrl: String? = null,
+        val role: String = ""
     )
 
     class LoginActivity : AppCompatActivity() {
@@ -123,15 +125,21 @@
                             email = document.getString("email") ?: "",
                             phone = document.getString("phone") ?: "",
                             birthDate = document.getString("birthDate") ?: "",
-                            profileImageUrl = document.getString("profileImageUrl")
+                            profileImageUrl = document.getString("profileImageUrl"),
+                            role = document.getString("role") ?: ""
                         )
 
                         saveUserProfile(userProfile)
 
-                        // Navegar a InitialMapActivity solo después de cargar los datos
-                        val intent = Intent(this, InitialMapActivity::class.java)
-                        startActivity(intent)
-                        finish()
+                        if(userProfile.role == "Conductor") {
+                            val intent = Intent(this, InitialDriverActivity::class.java)
+                            startActivity(intent)
+                            finish()
+                        } else {
+                            val intent = Intent(this, InitialMapActivity::class.java)
+                            startActivity(intent)
+                            finish()
+                        }
                     }
                 }
                 .addOnFailureListener { exception ->

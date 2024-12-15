@@ -44,14 +44,12 @@ android {
 }
 
 dependencies {
-
-    implementation(libs.androidx.core.ktx)
+    implementation(libs.androidx.core.ktx) // androidx.core:core
     implementation(libs.material)
     implementation(libs.androidx.activity)
     implementation(libs.androidx.constraintlayout)
     implementation(libs.play.services.location)
     implementation(libs.firebaseAuth)
-    implementation(libs.firebaseStorage)
     implementation(libs.firebaseStore)
     implementation(libs.firebaseAnalitics)
     implementation(libs.firebase.crashlytics)
@@ -60,7 +58,6 @@ dependencies {
     implementation(libs.retrofit)
     implementation(libs.corrutines)
     implementation(libs.gson)
-    implementation(libs.firebase.crashlytics)
     implementation(libs.play.services.cast.tv)
     implementation(libs.androidx.appcompat)
     testImplementation(libs.junit)
@@ -68,4 +65,6 @@ dependencies {
     androidTestImplementation(libs.androidx.espresso.core)
     implementation(libs.maps)
     implementation(libs.places)
+    implementation(libs.zxing.android.embedded)
+    implementation(libs.zxing.core)
 }

@@ -1,6 +1,7 @@
 package com.softcraft.rutaxpressapp.viewsDriver
 
 import android.Manifest
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.Address
 import android.location.Geocoder
@@ -8,6 +9,7 @@ import android.os.Bundle
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.cardview.widget.CardView
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.google.android.gms.location.LocationServices
@@ -29,6 +31,12 @@ class InitialDriverActivity : AppCompatActivity(), OnMapReadyCallback {
         setContentView(R.layout.activity_initial_driver)
         tvCurrentPlace = findViewById(R.id.tvCurrentPlace)
         createFragment()
+
+        val cvCharge: CardView = findViewById(R.id.cvCharge)
+        cvCharge.setOnClickListener {
+            val intent = Intent(this, QrPaymentActivity::class.java)
+            startActivity(intent)
+        }
     }
 
     private fun createFragment() {
