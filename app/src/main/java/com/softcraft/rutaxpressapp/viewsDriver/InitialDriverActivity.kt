@@ -25,6 +25,7 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.softcraft.rutaxpressapp.LoginActivity
 import com.softcraft.rutaxpressapp.R
 import java.io.IOException
 import java.util.Locale
