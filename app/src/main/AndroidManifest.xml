@@ -19,6 +19,9 @@
         android:theme="@style/Theme.RutaXpressApp"
         tools:targetApi="31">
         <activity
+            android:name=".driverView.InitialDriverActivity"
+            android:exported="false" />
+        <activity
             android:name=".driverView.InitialMapDriverActivity"
             android:exported="false" />
         <activity

@@ -20,8 +20,7 @@ import com.softcraft.rutaxpressapp.R
 import java.io.IOException
 import java.util.Locale
 
-class InitialMapDriverActivity : AppCompatActivity(), OnMapReadyCallback {
-
+class InitialDriverActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var map: GoogleMap
     private lateinit var tvCurrentPlace: TextView
 
@@ -49,6 +48,9 @@ class InitialMapDriverActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private fun moveCameraToCurrentLocation() {
         val fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            return
+        }
         fusedLocationClient.lastLocation.addOnSuccessListener { location ->
             if (location != null) {
                 val userLocation = LatLng(location.latitude, location.longitude)
@@ -85,6 +87,9 @@ class InitialMapDriverActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private fun enableLocation() {
         if (isLocationPermissionGranted()) {
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                return
+            }
             map.isMyLocationEnabled = true
         } else {
             requestLocationPermission()
