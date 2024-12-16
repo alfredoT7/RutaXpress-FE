@@ -72,12 +72,34 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="@string/model"
-                android:inputType="text "
+                android:inputType="text"
                 android:padding="10dp"
                 android:background="@android:color/transparent"
                 android:maxLines="1"
                 android:singleLine="true"
                 />
+
+        </androidx.cardview.widget.CardView>
+        <androidx.cardview.widget.CardView
+            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            app:cardCornerRadius="18dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginHorizontal="20dp"
+            app:cardBackgroundColor="@color/cv_bg_color"
+            app:cardElevation="0dp"
+            >
+
+            <EditText
+                android:id="@+id/etPlaca"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@android:color/transparent"
+                android:hint="Placa"
+                android:inputType="text"
+                android:maxLines="1"
+                android:padding="10dp"
+                android:singleLine="true" />
 
         </androidx.cardview.widget.CardView>
         <Button
@@ -94,6 +116,15 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Foto de RUAT"
+            android:layout_marginHorizontal="20dp"
+            android:layout_marginTop="20dp"
+            android:backgroundTint="@color/teal_700"
+            />
+        <Button
+            android:id="@+id/btnRoute"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Elige la linea"
             android:layout_marginHorizontal="20dp"
             android:layout_marginTop="20dp"
             android:backgroundTint="@color/teal_700"
