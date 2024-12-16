@@ -29,6 +29,7 @@ class VehicleFormActivity : AppCompatActivity() {
 
     private var imageUriVehicle: Uri? = null
     private var imageUriRUAT: Uri? = null
+    private var selectedLine: String = ""
     private lateinit var etMarca: EditText
     private lateinit var etModelo: EditText
     private lateinit var etPlaca: EditText
@@ -80,6 +81,7 @@ class VehicleFormActivity : AppCompatActivity() {
                 putExtra("placa", etPlaca.text.toString())
                 putExtra("imageUriVehicle", imageUriVehicle.toString())
                 putExtra("imageUriRUAT", imageUriRUAT.toString())
+                putExtra("selectedLine", selectedLine)
             }
             setResult(RESULT_OK, data)
             finish()
@@ -104,6 +106,7 @@ class VehicleFormActivity : AppCompatActivity() {
             when (requestCode) {
                 REQUEST_CODE_SELECT_LINE -> {
                     val selectedLine = data?.getStringExtra("selectedLine")
+                    this.selectedLine = selectedLine!!
                     Toast.makeText(this, "Línea seleccionada: $selectedLine", Toast.LENGTH_SHORT).show()
                 }
                 REQUEST_IMAGE_CAPTURE_VEHICLE -> {
