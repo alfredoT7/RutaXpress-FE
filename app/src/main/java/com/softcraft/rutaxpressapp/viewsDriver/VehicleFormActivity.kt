@@ -14,6 +14,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.auth.FirebaseAuth
+import com.softcraft.rutaxpressapp.LineasFilterActivity
 import com.softcraft.rutaxpressapp.LoginActivity
 import com.softcraft.rutaxpressapp.R
 import java.io.ByteArrayOutputStream
@@ -22,6 +23,7 @@ class VehicleFormActivity : AppCompatActivity() {
     companion object {
         private const val REQUEST_IMAGE_CAPTURE_VEHICLE = 1
         private const val REQUEST_IMAGE_CAPTURE_RUAT = 2
+        private const val REQUEST_CODE_SELECT_LINE = 3
         private const val TAG = "VehicleFormActivity"
     }
 
@@ -32,8 +34,10 @@ class VehicleFormActivity : AppCompatActivity() {
     private lateinit var btnFotoVehiculo: Button
     private lateinit var btnFotoRUAT: Button
     private lateinit var btnFinishRegister: Button
+    private lateinit var btnChooseLine: Button
     private lateinit var db: FirebaseFirestore
     private lateinit var auth: FirebaseAuth
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -53,6 +57,7 @@ class VehicleFormActivity : AppCompatActivity() {
         btnFotoVehiculo = findViewById(R.id.btnFotoVehiculo)
         btnFotoRUAT = findViewById(R.id.btnFotoRUAT)
         btnFinishRegister = findViewById(R.id.btnFinishRegister)
+        btnChooseLine = findViewById(R.id.btnChooseLine)
     }
 
     private fun initListeners() {
@@ -62,11 +67,17 @@ class VehicleFormActivity : AppCompatActivity() {
         btnFotoRUAT.setOnClickListener {
             showCameraLabelDialog("Saca foto del RUAT", REQUEST_IMAGE_CAPTURE_RUAT)
         }
+        btnChooseLine.setOnClickListener {
+            val intent = Intent(this, LineasFilterActivity::class.java)
+            intent.putExtra("isDriver", true)
+            startActivityForResult(intent, REQUEST_CODE_SELECT_LINE)
+        }
         btnFinishRegister.setOnClickListener {
             saveVehicleData()
             val intent = Intent(this, LoginActivity::class.java)
             startActivity(intent)
         }
+
     }
 
     private fun showCameraLabelDialog(message: String, requestCode: Int) {
@@ -85,6 +96,11 @@ class VehicleFormActivity : AppCompatActivity() {
         super.onActivityResult(requestCode, resultCode, data)
         if (resultCode == RESULT_OK) {
             when (requestCode) {
+                REQUEST_CODE_SELECT_LINE -> {
+                    val selectedLine = data?.getStringExtra("selectedLine")
+                    // Manejar la línea seleccionada
+                    Toast.makeText(this, "Línea seleccionada: $selectedLine", Toast.LENGTH_SHORT).show()
+                }
                 REQUEST_IMAGE_CAPTURE_VEHICLE -> {
                     imageUriVehicle = data?.data
                 }
@@ -94,6 +110,7 @@ class VehicleFormActivity : AppCompatActivity() {
             }
         }
     }
+
 
     private fun saveVehicleData() {
         val marca = etMarca.text.toString()
@@ -130,4 +147,6 @@ class VehicleFormActivity : AppCompatActivity() {
         bitmap.compress(Bitmap.CompressFormat.JPEG, 50, outputStream)
         return outputStream.toByteArray()
     }
+
+
 }

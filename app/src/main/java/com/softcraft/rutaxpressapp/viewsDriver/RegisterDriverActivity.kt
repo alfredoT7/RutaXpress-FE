@@ -30,7 +30,6 @@ class RegisterDriverActivity : AppCompatActivity() {
     private lateinit var cvCarnetDeIdentidad: CardView
     private lateinit var cvDriverLicense: CardView
     private lateinit var cvDataVehicle: CardView
-    private lateinit var cvTransportLine: CardView
     private lateinit var btnFinishRegister: Button
     private lateinit var userId: String
 
@@ -57,7 +56,6 @@ class RegisterDriverActivity : AppCompatActivity() {
         cvCarnetDeIdentidad = findViewById(R.id.cvCarnetDeIdentidad)
         cvDriverLicense = findViewById(R.id.cvDriverLicense)
         cvDataVehicle = findViewById(R.id.cvDataVehicle)
-        cvTransportLine = findViewById(R.id.cvTransportLine)
         btnFinishRegister = findViewById(R.id.btnFinishRegister)
     }
 
@@ -72,9 +70,6 @@ class RegisterDriverActivity : AppCompatActivity() {
             val intent = Intent(this@RegisterDriverActivity, VehicleFormActivity::class.java)
             intent.putExtra("userId", userId)
             startActivity(intent)
-        }
-        cvTransportLine.setOnClickListener {
-
         }
         btnFinishRegister.setOnClickListener {
             val intent = Intent(this@RegisterDriverActivity, InitialDriverActivity::class.java)
