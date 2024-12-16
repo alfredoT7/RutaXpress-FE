@@ -8,6 +8,7 @@ import android.util.Log
 import android.view.inputmethod.EditorInfo
 import android.widget.EditText
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -28,25 +29,32 @@ class LineasFilterActivity : AppCompatActivity() {
     private lateinit var rvLineas: RecyclerView
     private lateinit var lineasAdapter: LineasAdapter
     private var allLineas: List<LineaResponse> = emptyList()
+    private var isDriver: Boolean = false
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
         setContentView(R.layout.activity_lineas_filter)
+
+        isDriver = intent.getBooleanExtra("isDriver", false)
+
         initComponents()
-        if (LineasRepository.lineas == null){
+        if (LineasRepository.lineas == null) {
             obtenerLineas()
-        }else{
+        } else {
             allLineas = LineasRepository.lineas!!
             lineasAdapter.submitList(allLineas)
         }
         initListeners()
     }
+
     private fun initComponents() {
         rvLineas = findViewById(R.id.rvLineas)
         rvLineas.layoutManager = LinearLayoutManager(this)
         lineasAdapter = LineasAdapter { linea -> onLineaClick(linea) }
         rvLineas.adapter = lineasAdapter
     }
+
     private fun obtenerLineas() {
         CoroutineScope(Dispatchers.IO).launch {
             try {
@@ -78,6 +86,7 @@ class LineasFilterActivity : AppCompatActivity() {
             }
         }
     }
+
     private fun initListeners() {
         val etSearchId: EditText = findViewById(R.id.etSearchId)
         etSearchId.setOnEditorActionListener { v, actionId, event ->
@@ -103,15 +112,30 @@ class LineasFilterActivity : AppCompatActivity() {
             override fun afterTextChanged(s: Editable?) {}
         })
     }
+
     private fun filtrarLineas(id: String) {
         val lineasFiltradas = allLineas.filter { it.routeId.contains(id, ignoreCase = true) }
         runOnUiThread {
             lineasAdapter.submitList(lineasFiltradas)
         }
     }
+
     private fun onLineaClick(linea: LineaResponse) {
-        val intent = Intent(this, ViewRoutesActivity::class.java)
-        intent.putExtra("routeId", linea.routeId)
-        startActivity(intent)
+        if (isDriver) {
+            AlertDialog.Builder(this)
+                .setMessage("¿Desea seleccionar esta línea?")
+                .setPositiveButton("Sí") { _, _ ->
+                    val intent = Intent()
+                    intent.putExtra("selectedLine", linea.routeId)
+                    setResult(RESULT_OK, intent)
+                    finish()
+                }
+                .setNegativeButton("No", null)
+                .show()
+        } else {
+            val intent = Intent(this, ViewRoutesActivity::class.java)
+            intent.putExtra("routeId", linea.routeId)
+            startActivity(intent)
+        }
     }
 }

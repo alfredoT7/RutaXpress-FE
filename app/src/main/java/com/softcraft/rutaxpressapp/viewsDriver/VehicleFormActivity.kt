@@ -23,6 +23,7 @@ class VehicleFormActivity : AppCompatActivity() {
     companion object {
         private const val REQUEST_IMAGE_CAPTURE_VEHICLE = 1
         private const val REQUEST_IMAGE_CAPTURE_RUAT = 2
+        private const val REQUEST_CODE_SELECT_LINE = 3
         private const val TAG = "VehicleFormActivity"
     }
 
@@ -68,7 +69,8 @@ class VehicleFormActivity : AppCompatActivity() {
         }
         btnChooseLine.setOnClickListener {
             val intent = Intent(this, LineasFilterActivity::class.java)
-            startActivity(intent)
+            intent.putExtra("isDriver", true)
+            startActivityForResult(intent, REQUEST_CODE_SELECT_LINE)
         }
         btnFinishRegister.setOnClickListener {
             saveVehicleData()
@@ -94,6 +96,11 @@ class VehicleFormActivity : AppCompatActivity() {
         super.onActivityResult(requestCode, resultCode, data)
         if (resultCode == RESULT_OK) {
             when (requestCode) {
+                REQUEST_CODE_SELECT_LINE -> {
+                    val selectedLine = data?.getStringExtra("selectedLine")
+                    // Manejar la línea seleccionada
+                    Toast.makeText(this, "Línea seleccionada: $selectedLine", Toast.LENGTH_SHORT).show()
+                }
                 REQUEST_IMAGE_CAPTURE_VEHICLE -> {
                     imageUriVehicle = data?.data
                 }
@@ -103,6 +110,7 @@ class VehicleFormActivity : AppCompatActivity() {
             }
         }
     }
+
 
     private fun saveVehicleData() {
         val marca = etMarca.text.toString()
@@ -139,4 +147,6 @@ class VehicleFormActivity : AppCompatActivity() {
         bitmap.compress(Bitmap.CompressFormat.JPEG, 50, outputStream)
         return outputStream.toByteArray()
     }
+
+
 }
