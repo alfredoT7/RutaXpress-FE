@@ -14,6 +14,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.auth.FirebaseAuth
+import com.softcraft.rutaxpressapp.LineasFilterActivity
 import com.softcraft.rutaxpressapp.LoginActivity
 import com.softcraft.rutaxpressapp.R
 import java.io.ByteArrayOutputStream
@@ -32,8 +33,10 @@ class VehicleFormActivity : AppCompatActivity() {
     private lateinit var btnFotoVehiculo: Button
     private lateinit var btnFotoRUAT: Button
     private lateinit var btnFinishRegister: Button
+    private lateinit var btnChooseLine: Button
     private lateinit var db: FirebaseFirestore
     private lateinit var auth: FirebaseAuth
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -53,6 +56,7 @@ class VehicleFormActivity : AppCompatActivity() {
         btnFotoVehiculo = findViewById(R.id.btnFotoVehiculo)
         btnFotoRUAT = findViewById(R.id.btnFotoRUAT)
         btnFinishRegister = findViewById(R.id.btnFinishRegister)
+        btnChooseLine = findViewById(R.id.btnChooseLine)
     }
 
     private fun initListeners() {
@@ -62,11 +66,16 @@ class VehicleFormActivity : AppCompatActivity() {
         btnFotoRUAT.setOnClickListener {
             showCameraLabelDialog("Saca foto del RUAT", REQUEST_IMAGE_CAPTURE_RUAT)
         }
+        btnChooseLine.setOnClickListener {
+            val intent = Intent(this, LineasFilterActivity::class.java)
+            startActivity(intent)
+        }
         btnFinishRegister.setOnClickListener {
             saveVehicleData()
             val intent = Intent(this, LoginActivity::class.java)
             startActivity(intent)
         }
+
     }
 
     private fun showCameraLabelDialog(message: String, requestCode: Int) {
