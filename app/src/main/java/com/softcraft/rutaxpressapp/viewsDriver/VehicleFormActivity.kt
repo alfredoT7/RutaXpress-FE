@@ -14,6 +14,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.auth.FirebaseAuth
+import com.softcraft.rutaxpressapp.LineasFilterActivity
 import com.softcraft.rutaxpressapp.LoginActivity
 import com.softcraft.rutaxpressapp.R
 import java.io.ByteArrayOutputStream
@@ -22,16 +23,20 @@ class VehicleFormActivity : AppCompatActivity() {
     companion object {
         private const val REQUEST_IMAGE_CAPTURE_VEHICLE = 1
         private const val REQUEST_IMAGE_CAPTURE_RUAT = 2
+        private const val REQUEST_CODE_SELECT_LINE = 3
         private const val TAG = "VehicleFormActivity"
     }
 
     private var imageUriVehicle: Uri? = null
     private var imageUriRUAT: Uri? = null
+    private var selectedLine: String = ""
     private lateinit var etMarca: EditText
     private lateinit var etModelo: EditText
+    private lateinit var etPlaca: EditText
     private lateinit var btnFotoVehiculo: Button
     private lateinit var btnFotoRUAT: Button
     private lateinit var btnFinishRegister: Button
+    private lateinit var btnChooseLine: Button
     private lateinit var db: FirebaseFirestore
     private lateinit var auth: FirebaseAuth
 
@@ -50,9 +55,11 @@ class VehicleFormActivity : AppCompatActivity() {
     private fun initComponents() {
         etMarca = findViewById(R.id.etMarca)
         etModelo = findViewById(R.id.etModelo)
+        etPlaca = findViewById(R.id.etPlaca)
         btnFotoVehiculo = findViewById(R.id.btnFotoVehiculo)
         btnFotoRUAT = findViewById(R.id.btnFotoRUAT)
         btnFinishRegister = findViewById(R.id.btnFinishRegister)
+        btnChooseLine = findViewById(R.id.btnChooseLine)
     }
 
     private fun initListeners() {
@@ -62,10 +69,22 @@ class VehicleFormActivity : AppCompatActivity() {
         btnFotoRUAT.setOnClickListener {
             showCameraLabelDialog("Saca foto del RUAT", REQUEST_IMAGE_CAPTURE_RUAT)
         }
+        btnChooseLine.setOnClickListener {
+            val intent = Intent(this, LineasFilterActivity::class.java)
+            intent.putExtra("isDriver", true)
+            startActivityForResult(intent, REQUEST_CODE_SELECT_LINE)
+        }
         btnFinishRegister.setOnClickListener {
-            saveVehicleData()
-            val intent = Intent(this, LoginActivity::class.java)
-            startActivity(intent)
+            val data = Intent().apply {
+                putExtra("marca", etMarca.text.toString())
+                putExtra("modelo", etModelo.text.toString())
+                putExtra("placa", etPlaca.text.toString())
+                putExtra("imageUriVehicle", imageUriVehicle.toString())
+                putExtra("imageUriRUAT", imageUriRUAT.toString())
+                putExtra("selectedLine", selectedLine)
+            }
+            setResult(RESULT_OK, data)
+            finish()
         }
     }
 
@@ -85,6 +104,11 @@ class VehicleFormActivity : AppCompatActivity() {
         super.onActivityResult(requestCode, resultCode, data)
         if (resultCode == RESULT_OK) {
             when (requestCode) {
+                REQUEST_CODE_SELECT_LINE -> {
+                    val selectedLine = data?.getStringExtra("selectedLine")
+                    this.selectedLine = selectedLine!!
+                    Toast.makeText(this, "Línea seleccionada: $selectedLine", Toast.LENGTH_SHORT).show()
+                }
                 REQUEST_IMAGE_CAPTURE_VEHICLE -> {
                     imageUriVehicle = data?.data
                 }
@@ -93,41 +117,5 @@ class VehicleFormActivity : AppCompatActivity() {
                 }
             }
         }
-    }
-
-    private fun saveVehicleData() {
-        val marca = etMarca.text.toString()
-        val modelo = etModelo.text.toString()
-        val userId = auth.currentUser?.uid
-
-        if (marca.isEmpty() || modelo.isEmpty() || userId == null) {
-            Toast.makeText(this, "Por favor complete todos los campos", Toast.LENGTH_SHORT).show()
-            return
-        }
-
-        val vehicleData = hashMapOf(
-            "userId" to userId,
-            "marca" to marca,
-            "modelo" to modelo,
-            "imageUriVehicle" to imageUriVehicle.toString(),
-            "imageUriRUAT" to imageUriRUAT.toString()
-        )
-
-        db.collection("vehicles").add(vehicleData)
-            .addOnSuccessListener {
-                Toast.makeText(this, "Registro de vehículo exitoso", Toast.LENGTH_SHORT).show()
-                finish()
-            }
-            .addOnFailureListener { e ->
-                Log.w(TAG, "Error al registrar el vehículo", e)
-                Toast.makeText(this, "Error al registrar el vehículo", Toast.LENGTH_SHORT).show()
-            }
-    }
-
-    private fun compressImage(uri: Uri): ByteArray {
-        val bitmap = MediaStore.Images.Media.getBitmap(contentResolver, uri)
-        val outputStream = ByteArrayOutputStream()
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 50, outputStream)
-        return outputStream.toByteArray()
     }
 }
