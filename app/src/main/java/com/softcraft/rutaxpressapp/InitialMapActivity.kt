@@ -295,6 +295,7 @@ class InitialMapActivity : AppCompatActivity(), OnMapReadyCallback,
 
     override fun onMapReady(googleMap: GoogleMap) {
         map = googleMap
+        //map.mapType = GoogleMap.MAP_TYPE_SATELLITE
         map.setOnMyLocationButtonClickListener(this)
         if (isLocationPermissionGranted()) {
             enableLocation()
