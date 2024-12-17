@@ -25,7 +25,7 @@
     <string name="search_btn_text_filter_routes">Busca una linea</string>
     <string name="all_lineas">Todas las lineas</string>
     <string name="choose_direction">Elige la dirección de tu transporte</string>
-    <string name="choose_one_option">Elige uno de estas opciones para esta ruta:</string>
+    <string name="choose_one_option">Elige una de estas opciones para esta ruta:</string>
     <string name="confirm_direction_trufi">Confirmar dirección del trufi</string>
     <string name="route_start">Ruta de ida</string>
     <string name="route_end">Ruta de vuelta</string>

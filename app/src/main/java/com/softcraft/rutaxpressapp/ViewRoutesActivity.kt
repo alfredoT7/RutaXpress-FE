@@ -226,7 +226,7 @@ class ViewRoutesActivity : AppCompatActivity(), OnMapReadyCallback {
                         runOnUiThread {
                             Toast.makeText(
                                 this@ViewRoutesActivity,
-                                "Error al obtener las rutas favoritas",
+                                "Puedes agregar lineas dentro de tus favoritas",
                                 Toast.LENGTH_SHORT
                             ).show()
                         }

@@ -199,7 +199,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:layout_gravity="center"
-            android:text="Elegir como una de tus rutas Favoritas"
+            android:text="Seleccionar como ruta favorita"
             android:textSize="18sp"
             android:layout_marginVertical="0dp"
             android:textStyle="bold"
