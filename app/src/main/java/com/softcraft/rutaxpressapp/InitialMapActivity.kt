@@ -13,6 +13,7 @@ import android.location.Geocoder
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import android.view.ViewGroup
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.PopupMenu
@@ -625,13 +626,28 @@ class InitialMapActivity : AppCompatActivity(), OnMapReadyCallback,
 
     private fun showUserProfile() {
         val sharedPref = getSharedPreferences("UserPrefs", Context.MODE_PRIVATE)
-        val userName = sharedPref.getString("userName", "Usuario")
-        val useEmail = sharedPref.getString("userEmail", "Correo no disponible")
+        val userName = sharedPref.getString("username", "Usuario")
+        val userEmail = sharedPref.getString("email", "Correo no disponible")
+        val profileImageUrl = sharedPref.getString("profileImageUrl", null)
+        val theRol = sharedPref.getString("userRole", "Rol no identificado")
 
-        AlertDialog.Builder(this)
-            .setTitle("Perfil de usuario")
-            .setMessage("Nombre: $userName\nCorreo: $useEmail")
-            .setPositiveButton("Cerrar") { dialog, _ -> dialog.dismiss()}
-            .show()
+        val builder = AlertDialog.Builder(this)
+        builder.setTitle("Perfil de usuario")
+        builder.setMessage("Nombre: $userName\nCorreo: $userEmail\nRol: $theRol")
+
+        // Cargar imagen
+        if (!profileImageUrl.isNullOrEmpty()) {
+            val imageView = ImageView(this)
+            imageView.layoutParams = ViewGroup.LayoutParams(300, 300)
+            Glide.with(this)
+                .load(profileImageUrl)
+                .placeholder(R.drawable.ic_default_profile) // Imagen predeterminada
+                .into(imageView)
+            builder.setView(imageView) // Asigna la imagen como vista
+        }
+
+        builder.setPositiveButton("Cerrar") { dialog, _ -> dialog.dismiss() }
+        builder.show()
     }
+
 }

@@ -65,8 +65,15 @@ class FavoriteRoutesActivity : AppCompatActivity() {
                     }
                 } else {
                     runOnUiThread {
-                        Toast.makeText(this@FavoriteRoutesActivity, "Error al obtener las rutas favoritas: ${response.errorBody()?.string()}", Toast.LENGTH_LONG).show()
+                        val errorMessage = response.errorBody()?.string()
+                        val toastMessage = if (errorMessage?.contains("Id no encontrado") == true) {
+                            "No existen lineas favoritas"
+                        } else {
+                            "Error al obtener las rutas favoritas: $errorMessage"
+                        }
+                        Toast.makeText(this@FavoriteRoutesActivity, toastMessage, Toast.LENGTH_LONG).show()
                     }
+
                 }
             } catch (e: Exception) {
                 runOnUiThread {
