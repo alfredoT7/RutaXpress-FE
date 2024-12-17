@@ -2,12 +2,14 @@ package com.softcraft.rutaxpressapp.viewsDriver
 
 import android.Manifest
 import android.app.AlertDialog
+import android.content.ContentValues.TAG
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.Address
 import android.location.Geocoder
 import android.os.Bundle
+import android.util.Log
 import android.widget.ImageView
 import android.view.View
 import android.widget.PopupMenu
@@ -16,6 +18,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -27,6 +30,8 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.softcraft.rutaxpressapp.LoginActivity
 import com.softcraft.rutaxpressapp.R
+import com.softcraft.rutaxpressapp.service.ApiClient
+import kotlinx.coroutines.launch
 import java.io.IOException
 import java.util.Locale
 
@@ -37,6 +42,8 @@ class InitialDriverActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var imgProfile: ImageView
     private lateinit var db: FirebaseFirestore
     private lateinit var auth: FirebaseAuth
+    private lateinit var tvDriverLine: TextView
+    private lateinit var tvRouteDescription: TextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -44,10 +51,13 @@ class InitialDriverActivity : AppCompatActivity(), OnMapReadyCallback {
         tvCurrentPlace = findViewById(R.id.tvCurrentPlace)
         tvUserName = findViewById(R.id.tvUserName)
         imgProfile = findViewById(R.id.imgProfile)
+        tvDriverLine = findViewById(R.id.tvDriverLine)
+        tvRouteDescription = findViewById(R.id.tvRouteDescription)
         db = FirebaseFirestore.getInstance()
         auth = FirebaseAuth.getInstance()
         loadUserProfile()
         createFragment()
+        fetchDriverRouteAndDescription()
     }
 
     private fun loadUserProfile() {
@@ -216,5 +226,41 @@ class InitialDriverActivity : AppCompatActivity(), OnMapReadyCallback {
             .setMessage("Nombre: $userName\nCorreo: $useEmail")
             .setPositiveButton("Cerrar") { dialog, _ -> dialog.dismiss()}
             .show()
+    }
+
+    private fun fetchDriverRouteAndDescription() {
+        val userId = auth.currentUser?.uid ?: return
+        val apiService = ApiClient.apiService
+
+        lifecycleScope.launch {
+            try {
+                val driverRouteResponse = apiService.getDriverRoute(userId)
+                if (driverRouteResponse.isSuccessful) {
+                    val driverRoute = driverRouteResponse.body()
+                    driverRoute?.routes?.firstOrNull()?.let { routeId ->
+                        tvDriverLine.text = "Línea: $routeId"
+                        fetchRouteDescription(routeId)
+                    }
+                } else {
+                    Log.e(TAG, "Error al obtener la ruta del conductor: ${driverRouteResponse.message()}")
+                }
+            } catch (e: Exception) {
+                Log.e(TAG, "Error al realizar la petición: ${e.message}")
+            }
+        }
+    }
+    private suspend fun fetchRouteDescription(routeId: String) {
+        val apiService = ApiClient.apiService
+        try {
+            val routeDescriptionResponse = apiService.getRouteDescription(routeId)
+            if (routeDescriptionResponse.isSuccessful) {
+                val routeDescription = routeDescriptionResponse.body()
+                tvRouteDescription.text = "Ruta: ${routeDescription?.description}"
+            } else {
+                Log.e(TAG, "Error al obtener la descripción de la ruta: ${routeDescriptionResponse.message()}")
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Error al realizar la petición: ${e.message}")
+        }
     }
 }

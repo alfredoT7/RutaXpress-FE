@@ -1,5 +1,6 @@
 package com.softcraft.rutaxpressapp.routes
 
+import com.google.gson.annotations.SerializedName
 import com.softcraft.rutaxpressapp.lineas.LineaResponse
 import okhttp3.RequestBody
 import retrofit2.http.GET
@@ -43,7 +44,18 @@ interface ApiService {
         @Query("longitudeFinal") longitudeFinal: Double,
         @Query("latitudeFinal") latitudeFinal: Double
     ): Response<BestRouteResponse>
+    @GET("driver-routes/getDriverRoute/{idUser}")
+    suspend fun getDriverRoute(@Path("idUser") idUser: String): Response<DriverRouteResponse>
+
+    @GET("descriptions/{routeId}")
+    suspend fun getRouteDescription(@Path("routeId") routeId: String): Response<LineaResponse>
+
 }
+data class DriverRouteResponse(
+    @SerializedName("idUser") val idUser: String,
+    @SerializedName("routes") val routes: List<String>,
+    @SerializedName("Placa") val placa: String
+)
 data class FavoriteRequest(
     val idUser: String,
     val route: String
