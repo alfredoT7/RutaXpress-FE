@@ -125,7 +125,7 @@ class InitialDriverActivity : AppCompatActivity(), OnMapReadyCallback {
         if (isLocationPermissionGranted()) {
             enableLocation()
             startUpdatingLocation()
-            //moveCameraToCurrentLocation()
+            moveCameraToCurrentLocation()
         } else {
             requestLocationPermission()
         }
@@ -238,7 +238,7 @@ class InitialDriverActivity : AppCompatActivity(), OnMapReadyCallback {
             if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 enableLocation()
                 startUpdatingLocation()
-                //moveCameraToCurrentLocation()
+                moveCameraToCurrentLocation()
             } else {
                 Toast.makeText(this, "Permiso de ubicación no concedido", Toast.LENGTH_SHORT).show()
             }

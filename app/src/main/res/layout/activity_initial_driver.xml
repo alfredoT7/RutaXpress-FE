@@ -80,7 +80,9 @@
         android:layout_height="62dp"
         android:layout_marginHorizontal="20dp"
         android:layout_marginTop="8dp"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+
+        >
 
         <androidx.cardview.widget.CardView
             android:id="@+id/cvFavoriteRoutes"
@@ -91,12 +93,14 @@
             app:cardElevation="0dp"
             app:cardBackgroundColor="@color/cv_bg_color"
             app:cardCornerRadius="19dp"
+            android:layout_gravity="center"
             >
 
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal">
+                android:orientation="horizontal"
+                android:layout_gravity="center">
                 <ImageView
                     android:layout_width="35dp"
                     android:layout_height="35dp"
@@ -108,39 +112,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
-                    android:text="@string/driver_profile">
-                </TextView>
-            </LinearLayout>
-        </androidx.cardview.widget.CardView>
-
-        <androidx.cardview.widget.CardView
-            android:id="@+id/cvBusLines"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            app:cardBackgroundColor="@color/cv_bg_color"
-            app:cardCornerRadius="19dp"
-            app:cardElevation="0dp"
-            >
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal">
-
-                <ImageView
-                    android:layout_width="35dp"
-                    android:layout_height="35dp"
-                    android:layout_margin="10dp"
-                    android:src="@drawable/ic_bus_icon"
-                    app:tint="@color/app_orange"
-                    >
-                </ImageView>
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:text="@string/bus_lines_driver">
+                    android:text="Cobrar">
                 </TextView>
             </LinearLayout>
         </androidx.cardview.widget.CardView>
