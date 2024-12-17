@@ -129,14 +129,14 @@
             android:layout_marginTop="20dp"
             android:backgroundTint="@color/teal_700"
             />
+
         <ImageView
             android:layout_width="500dp"
-            android:layout_height="290dp"
+            android:layout_height="176dp"
             android:layout_gravity="center"
-            android:src="@drawable/ic_bus_icon"
-            android:layout_marginTop="30dp"
             android:layout_marginHorizontal="40dp"
-            />
+            android:layout_marginTop="30dp"
+            android:src="@drawable/ic_bus_icon" />
     </LinearLayout>
 
     <Button

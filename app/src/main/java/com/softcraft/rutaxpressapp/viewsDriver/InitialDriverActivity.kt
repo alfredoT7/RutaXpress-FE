@@ -28,14 +28,20 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.gson.JsonObject
 import com.softcraft.rutaxpressapp.LoginActivity
 import com.softcraft.rutaxpressapp.R
+import io.socket.client.IO
+import io.socket.client.Socket
+import org.json.JSONObject
 import com.softcraft.rutaxpressapp.service.ApiClient
 import kotlinx.coroutines.launch
 import java.io.IOException
 import java.util.Locale
 
+
 class InitialDriverActivity : AppCompatActivity(), OnMapReadyCallback {
+    private lateinit var socket: Socket
     private lateinit var map: GoogleMap
     private lateinit var tvCurrentPlace: TextView
     private lateinit var tvUserName: TextView
@@ -55,9 +61,37 @@ class InitialDriverActivity : AppCompatActivity(), OnMapReadyCallback {
         tvRouteDescription = findViewById(R.id.tvRouteDescription)
         db = FirebaseFirestore.getInstance()
         auth = FirebaseAuth.getInstance()
+
+        socket = IO.socket("http://localhost:3000")
+        socket.connect()
+        socket.on("receiveLocation") { args ->
+            if (args.isNotEmpty()) {
+                val location = args[0] as JsonObject
+                val latitude = location["latitude"].asDouble
+                val longitude = location["longitude"].asDouble
+                runOnUiThread {
+                    Toast.makeText(this, "Nueva ubicación: $latitude, $longitude", Toast.LENGTH_SHORT).show()
+                    val driverLocation = LatLng(latitude, longitude)
+                    map.moveCamera(CameraUpdateFactory.newLatLng(driverLocation))
+                }
+            }
+        }
+
         loadUserProfile()
         createFragment()
         fetchDriverRouteAndDescription()
+    }
+
+    private fun sendLocationToPassenger(latitude: Double, longitude: Double) {
+        val location = JSONObject()
+        location.put("latitude", latitude)
+        location.put("longitude", longitude)
+        socket.emit("sendLocation", location)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        socket.disconnect()
     }
 
     private fun loadUserProfile() {
@@ -90,14 +124,52 @@ class InitialDriverActivity : AppCompatActivity(), OnMapReadyCallback {
         map = googleMap
         if (isLocationPermissionGranted()) {
             enableLocation()
-            moveCameraToCurrentLocation()
+            startUpdatingLocation()
+            //moveCameraToCurrentLocation()
         } else {
             requestLocationPermission()
         }
     }
 
+    private fun startUpdatingLocation() {
+        val fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
+        val handler = android.os.Handler(mainLooper)
+        val updateInterval = 5000L // Intervalo de actualización en milisegundos (5 segundos)
+
+        val updateLocationTask = object : Runnable {
+            override fun run() {
+                if (ActivityCompat.checkSelfPermission(
+                        this@InitialDriverActivity,
+                        Manifest.permission.ACCESS_FINE_LOCATION
+                    ) != PackageManager.PERMISSION_GRANTED
+                ) {
+                    return
+                }
+                fusedLocationClient.lastLocation.addOnSuccessListener { location ->
+                    if (location != null) {
+                        val userLocation = LatLng(location.latitude, location.longitude)
+
+                        // Mueve la cámara si es necesario
+                        map.moveCamera(CameraUpdateFactory.newLatLng(userLocation))
+
+                        // Actualiza la vista de la dirección
+                        updateCurrentPlaceTextView(userLocation)
+
+                        // Envía la ubicación a los pasajeros
+                        sendLocationToPassenger(location.latitude, location.longitude)
+                    }
+                }
+                // Vuelve a ejecutar la tarea después del intervalo
+                handler.postDelayed(this, updateInterval)
+            }
+        }
+        // Ejecuta la primera tarea
+        handler.post(updateLocationTask)
+    }
+
     private fun moveCameraToCurrentLocation() {
         val fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
+
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             return
         }
@@ -106,6 +178,7 @@ class InitialDriverActivity : AppCompatActivity(), OnMapReadyCallback {
                 val userLocation = LatLng(location.latitude, location.longitude)
                 map.moveCamera(CameraUpdateFactory.newLatLngZoom(userLocation, 15f))
                 updateCurrentPlaceTextView(userLocation)
+                sendLocationToPassenger(location.latitude, location.longitude)
             } else {
                 Toast.makeText(this, "Ubicación no disponible", Toast.LENGTH_SHORT).show()
             }
@@ -164,7 +237,8 @@ class InitialDriverActivity : AppCompatActivity(), OnMapReadyCallback {
         if (requestCode == REQUEST_CODE_LOCATION) {
             if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 enableLocation()
-                moveCameraToCurrentLocation()
+                startUpdatingLocation()
+                //moveCameraToCurrentLocation()
             } else {
                 Toast.makeText(this, "Permiso de ubicación no concedido", Toast.LENGTH_SHORT).show()
             }

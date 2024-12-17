@@ -43,4 +43,6 @@
     <string name="make">Marca</string>
     <string name="model">Modelo</string>
     <string name="driver_profile2">Mi perfil conductor</string>
+    <string name="Ruta">Linea</string>
+
 </resources>
