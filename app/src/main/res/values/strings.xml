@@ -34,7 +34,7 @@
     <string name="markers">Marcadores:</string>
     <string name="favorites_lines">Tus lineas favoritas</string>
     <string name="contrase_a">Contraseña</string>
-    <string name="validations">Validaciones Extra</string>
+    <string name="validations">Registro de vehiculo</string>
     <string name="driving_line">Linea actual:</string>
     <string name="start_route">Iniciar ruta</string>
     <string name="bus_lines_driver">Mis lineas</string>
@@ -42,5 +42,6 @@
     <string name="car_register">Registro del coche</string>
     <string name="make">Marca</string>
     <string name="model">Modelo</string>
+    <string name="Ruta">Linea</string>
 
 </resources>

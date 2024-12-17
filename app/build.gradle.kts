@@ -68,4 +68,5 @@ dependencies {
     androidTestImplementation(libs.androidx.espresso.core)
     implementation(libs.maps)
     implementation(libs.places)
+    implementation(libs.socket)
 }
