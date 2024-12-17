@@ -49,7 +49,8 @@ class ViewRoutesActivity : AppCompatActivity(), OnMapReadyCallback {
     private var endRouteResponse: BackendRouteResponse? = null
     private val routeController:RouteController = RouteController()
     private var favoriteRoutesId: List<String> = emptyList()
-
+    private lateinit var limits: LatLngBounds
+    
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
@@ -89,8 +90,9 @@ class ViewRoutesActivity : AppCompatActivity(), OnMapReadyCallback {
             polyline.width = 12f
             val builder = LatLngBounds.Builder()
             polyline.points.forEach { point -> builder.include(point) }
+            this@ViewRoutesActivity.limits = builder.build()
             val bounds = builder.build()
-            map.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, 100))
+            map.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, 50))
         }
     }
 
@@ -201,9 +203,14 @@ class ViewRoutesActivity : AppCompatActivity(), OnMapReadyCallback {
 
     override fun onMapReady(googleMap: GoogleMap) {
         map = googleMap
-        val cocha = LatLng(-17.39509587774758, -66.16185635257042)
-        map.animateCamera(CameraUpdateFactory.newLatLngZoom(cocha, 8f), 300, null)
+        if (::limits.isInitialized) {
+            map.animateCamera(CameraUpdateFactory.newLatLngBounds(limits, 50))
+        } else {
+            val cocha = LatLng(-17.39509587774758, -66.16185635257042)
+            map.animateCamera(CameraUpdateFactory.newLatLngZoom(cocha, 8f), 300, null)
+        }
     }
+
 
     private fun checkFavoriteStatus() {
         val userId = UserRepository.userId ?: return
