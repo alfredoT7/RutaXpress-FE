@@ -11,6 +11,8 @@ import android.graphics.BitmapFactory
 import android.location.Address
 import android.location.Geocoder
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import android.view.View
 import android.view.ViewGroup
@@ -112,6 +114,7 @@ class InitialMapActivity : AppCompatActivity(), OnMapReadyCallback,
         socket.connect()
         // Escucha la ubicación de otros usuarios
         socket.on("receiveLocation", onLocationReceived)
+        sendLocationUpdates()
     }
 
     private fun initComponents() {
@@ -684,6 +687,41 @@ class InitialMapActivity : AppCompatActivity(), OnMapReadyCallback,
         }
     }
     private fun addMarkerToMap(latLng: LatLng) {
-        map.addMarker(MarkerOptions().position(latLng).title("Usuario"))
+        map.addMarker(
+            MarkerOptions()
+                .position(latLng)
+                .title("Ubicación de usuario")
+                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE))
+        )
     }
-}
+    private fun sendLocationUpdates() {
+        val fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
+        fusedLocationClient.lastLocation.addOnSuccessListener { location ->
+            if (location != null) {
+                val jsonObject = JSONObject()
+                jsonObject.put("latitude", location.latitude)
+                jsonObject.put("longitude", location.longitude)
+
+                socket.emit("sendLocation", jsonObject)
+            }
+        }
+    }
+    private val handler = Handler(Looper.getMainLooper())
+
+    private val locationRunnable = object : Runnable {
+        override fun run() {
+            sendLocationUpdates()
+            handler.postDelayed(this, 2000) // Enviar cada 5 segundos
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        handler.post(locationRunnable)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        handler.removeCallbacks(locationRunnable)
+    }
+    }
