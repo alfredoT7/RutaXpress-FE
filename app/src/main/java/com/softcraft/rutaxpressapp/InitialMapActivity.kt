@@ -42,13 +42,13 @@ import com.google.android.gms.maps.model.LatLngBounds
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.Polyline
 import com.google.android.gms.maps.model.PolylineOptions
-import com.google.firebase.firestore.auth.User
 import com.softcraft.rutaxpressapp.lineas.LineasRepository
 import com.softcraft.rutaxpressapp.routes.ApiService
 import com.softcraft.rutaxpressapp.routes.BackendRouteResponse
 import com.softcraft.rutaxpressapp.routes.RouteResponse
 import com.softcraft.rutaxpressapp.service.ApiClient
 import com.softcraft.rutaxpressapp.user.UserRepository
+import io.socket.client.Socket
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -56,6 +56,9 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.io.IOException
 import java.util.Locale
+import io.socket.client.IO
+import io.socket.emitter.Emitter
+import org.json.JSONObject
 
 class InitialMapActivity : AppCompatActivity(), OnMapReadyCallback,
     OnMyLocationButtonClickListener {
@@ -78,6 +81,8 @@ class InitialMapActivity : AppCompatActivity(), OnMapReadyCallback,
     private var fromMarker: Marker? = null
     private var toMarker: Marker? = null
     private var currentRoutePolyline: Polyline? = null
+    private lateinit var socket: Socket
+
 
     companion object {
         private const val REQUEST_CODE_SEARCH_FROM = 1
@@ -97,6 +102,16 @@ class InitialMapActivity : AppCompatActivity(), OnMapReadyCallback,
         } else {
             requestLocationPermission()
         }
+
+        // Inicializa el socket
+        try {
+            socket = IO.socket("https://ruta-xpress-backend-express-js.vercel.app/")
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+        socket.connect()
+        // Escucha la ubicación de otros usuarios
+        socket.on("receiveLocation", onLocationReceived)
     }
 
     private fun initComponents() {
@@ -650,5 +665,25 @@ class InitialMapActivity : AppCompatActivity(), OnMapReadyCallback,
         builder.setPositiveButton("Cerrar") { dialog, _ -> dialog.dismiss() }
         builder.show()
     }
+    override fun onDestroy() {
+        super.onDestroy()
+        socket.disconnect() //en caso de cerrar
+    }
 
+    private val onLocationReceived = Emitter.Listener { args ->
+        if (args.isNotEmpty()) {
+            val data = args[0] as JSONObject
+            val latitude = data.getDouble("latitude")
+            val longitude = data.getDouble("longitude")
+
+            // Actualiza la ubicación de otros usuarios en el mapa
+            runOnUiThread {
+                val latLng = LatLng(latitude, longitude)
+                addMarkerToMap(latLng)
+            }
+        }
+    }
+    private fun addMarkerToMap(latLng: LatLng) {
+        map.addMarker(MarkerOptions().position(latLng).title("Usuario"))
+    }
 }
